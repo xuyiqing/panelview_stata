@@ -8,15 +8,33 @@ We develop this package in the belief that it is always a good idea to understan
 
 **Date:** August 3, 2021
 
-**Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata))
+**Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata)) Please report bugs!
 
 ------
 
-__Table of Contents__  
+__Contents__  
 
 [TOC]
 
 ------
+
+## 0. Installation
+
+Manual installation takes three simple steps:
+
+1. Download the zip file from: https://github.com/xuyiqing/panelView_stata
+
+2. Unzip the file
+
+3. Type the following commands in your STATA console (the "full_local_path" is your local path of the unzipped file):
+
+   ```
+   . cap ado uninstall fect
+   
+   . net install fect, all replace from(full_local_path)
+   ```
+
+   
 
 ## 1. Syntax
 
