@@ -1,6 +1,7 @@
 /*
 Version 0.1
 Aug 03 2021
+Yiqing Xu, Hongyu Mou
 */
 
 capture program drop panelView
