@@ -72,7 +72,7 @@ use turnout.dta, clear
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")  prepost(off) 
 ```
 
-<img src="./graph/Graph1.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph1.png)
 
 We can use the `bytiming` option to sort units by the timing of receiving the treatment and change the labels in the legend: 
 
@@ -81,7 +81,7 @@ We can use the `bytiming` option to sort units by the timing of receiving the tr
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")  prepost(off) bytiming legend(label(1 "No EDR") label(2 "EDR"))
 ```
 
-<img src="./graph/Graph2.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph2.png)
 
 Distinguish the pre- and post-treatment periods for treated units by not specifying `prepost(off)`: 
 
@@ -90,7 +90,7 @@ Distinguish the pre- and post-treatment periods for treated units by not specify
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") 
 ```
 
-<img src="./graph/Graph3.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph3.png)
 
 Again, sort units by the timing of receiving the treatment:
 
@@ -99,7 +99,7 @@ Again, sort units by the timing of receiving the treatment:
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") bytiming
 ```
 
-<img src="./graph/Graph4.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph4.png)
 
 Remove the labels on the y-axis by specifying `ylabel("")` or `ylabel(none)`: 
 
@@ -107,7 +107,7 @@ Remove the labels on the y-axis by specifying `ylabel("")` or `ylabel(none)`:
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) title("EDR Reform") prepost(off) ylabel("")
 ```
 
-<img src="./graph/Graph5.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph5.png)
 
 Change the color schemes  for the controls and treated using the `mycolor` option. For example, `PuBu` indicates light purple to blue (3-9 colors). Click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for more sequential colors' choice.
 
@@ -116,7 +116,7 @@ Change the color schemes  for the controls and treated using the `mycolor` optio
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") prepost(off) mycolor(PuBu) bytiming 
 ```
 
-<img src="./graph/Graph6.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph6.png)
 
 ### 2.2 Treatment: missing & switch on and off
 
@@ -127,7 +127,7 @@ use capacity.dta, clear
 panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10)
 ```
 
-<img src="./graph/Graph7.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph7.png)
 
 Sorting units based on the first period a unit receives the treatment gives a more appealing visual:
 
@@ -136,7 +136,7 @@ Sorting units based on the first period a unit receives the treatment gives a mo
 panelView lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) bytiming
 ```
 
-<img src="./graph/Graph8.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph8.png)
 
 Instead of indicate `country` as units, we use `i(ccode)` to indicate country code as units, which will change the label and sequence in our figure:
 
@@ -144,7 +144,7 @@ Instead of indicate `country` as units, we use `i(ccode)` to indicate country co
 panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) //If we set ylabdist(11), the "155" appears at the bottom of ylabel and is hard to remove, different with R package
 ```
 
-<img src="./graph/Graph9.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph9.png)
 
 Sort units based on the first period a unit receives the treatment and use `ylabel(none)` to remove the labels on the y-axis:
 
@@ -153,7 +153,7 @@ Sort units based on the first period a unit receives the treatment and use `ylab
 panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity: Treatement Status", size(medsmall)) bytiming xlabdist(3) ylabel(none) 
 ```
 
-<img src="./graph/Graph10.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph10.png)
 
 ### 2.3 Plotting a subset of units
 
@@ -165,7 +165,7 @@ egen ccodeid = group(ccode)
 panelView lnpop demo lngdp ccodeid if ccodeid >= 1 & ccodeid <= 26, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3)
 ```
 
-<img src="./graph/Graph11.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph11.png)
 
 Sort units based on the first period a unit receives the treatment: 
 
@@ -174,7 +174,7 @@ Sort units based on the first period a unit receives the treatment:
 panelView lnpop demo lngdp ccodeid if ccodeid >= 26 & ccodeid <= 51, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3) bytiming
 ```
 
-<img src="./graph/Graph12.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph12.png)
 
 ## 3. Ignoring Treatment Conditions
 
@@ -187,7 +187,7 @@ use capacity.dta, clear
 panelView demo, i(ccode) t(year) type(treat) mycolor(Reds) title("Missing Values") xlabel(none) ylabel(none) ignoretreat
 ```
 
-<img src="./graph/Graph13.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph13.png)
 
 ### 3.2 Treatment level = 1 & Plotting treatment
 
@@ -199,7 +199,7 @@ gen demo2 = 0
 panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) legend(off) // type(treat) & number of treatment level = 1: same as ignoretreat
 ```
 
-<img src="./graph/Graph14.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph14.png)
 
 ### 3.3 Treatment level = 1 & Plotting outcome
 
@@ -211,7 +211,7 @@ gen demo2 = 0
 panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Regime Type") legend(off) // type(outcome) & number of treatment level = 1: same as ignoretreat
 ```
 
-<img src="./graph/Graph15.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph15.png)
 
 ### 3.4 Plotting outcome & Continuous Treatment / More Than Two Treatment Levels
 
@@ -227,7 +227,7 @@ use capacity.dta, clear
 panelView Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring Stata Capacity") legend(off)
 ```
 
-<img src="./graph/Graph31.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph31.png)
 
 Same as the following two commands:
 
@@ -259,7 +259,7 @@ tab D, m
 panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title("Raw Data") prepost(off) // number of treatment level = 3
 ```
 
-<img src="./graph/Graph35.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph35.png)
 
 Same as the following two commands:
 
@@ -290,7 +290,7 @@ replace demo2 = 1 if polity2 > 0.5
 panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Blues) // type(treat) & number of treatment level = 3
 ```
 
-<img src="./graph/Graph16.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph16.png)
 
 ### 4.2 Treatment level = 4
 
@@ -303,7 +303,7 @@ replace demo2 = 1 if polity2 > 0.5
 panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Blues) // number of treatment level = 4
 ```
 
-<img src="./graph/Graph18.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph18.png)
 
 ### 4.3 Treatment level >= 5
 
@@ -320,7 +320,7 @@ tab demo2, m
 panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) continuoustreat
 ```
 
-<img src="./graph/Graph19.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph19.png)
 
 ### 4.4 Continuous treatment
 
@@ -331,7 +331,7 @@ use capacity.dta, clear
 panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) prepost(off) title("Regime Type") xlabdist(3) ylabdist(11) 
 ```
 
-<img src="./graph/Graph20.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph20.png)
 
 If we change the level of the continuous treatment variable, the legend will modify correspondingly: 
 
@@ -341,7 +341,7 @@ replace polity2 = polity2 + 1
 panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) prepost(off) title("Regime Type") xlabdist(3) ylabdist(11) 
 ```
 
-<img src="./graph/Graph21.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph21.png)
 
 ## 5. Continuous Outcomes
 
@@ -357,7 +357,7 @@ use turnout.dta, clear
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") ylabel(0 (25) 100)
 ```
 
-<img src="./graph/Graph22.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph22.png)
 
 Not distinguish the pre- and post-treatment periods for treated units: 
 
@@ -366,7 +366,7 @@ Not distinguish the pre- and post-treatment periods for treated units:
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") prepost(off) 
 ```
 
-<img src="./graph/Graph23.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph23.png)
 
 Apply the light purple to blue theme by specifying `mycolor(PuBu)`:
 
@@ -375,7 +375,7 @@ use turnout.dta, clear
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") mycolor(PuBu)
 ```
 
-<img src="./graph/Graph24.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph24.png)
 
 ### 5.2 Specify which unit(s) we want to take a look at
 
@@ -386,7 +386,7 @@ use turnout.dta, clear
 panelView turnout policy_edr policy_mail_in policy_motor if abb == 1|abb == 2|abb == 6, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout (AL, AR, CT)") mycolor(PuBu) 
 ```
 
-<img src="./graph/Graph25.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph25.png)
 
 ### 5.3 Put each unit into different groups, then plot respectively
 
@@ -397,7 +397,7 @@ use turnout.dta, clear
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bytreatgroup xlabel(1920 (20) 2000) 
 ```
 
-<img src="./graph/Graph26.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph26.png)
 
 ## 6. Plotting any variable in a panel dataset
 
@@ -408,7 +408,7 @@ use turnout.dta, clear
 panelView turnout, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("Turnout") ylabel(0 (25) 100) ignoretreat
 ```
 
-<img src="./graph/Graph27.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph27.png)
 
 ## 7. Discrete Outcomes 
 
@@ -421,7 +421,7 @@ use simdata.dta, replace
 panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) mycolor(Reds) discreteoutcome title("Raw Data") xlabel(8 (2) 15) ylabel(0 (1) 2)
 ```
 
-<img src="./graph/Graph28.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph28.png)
 
 ### 7.2 Put each unit into different groups, then plot respectively
 
@@ -432,5 +432,5 @@ use simdata.dta, replace
 panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bytreatgroup 
 ```
 
-<img src="./graph/Graph30.png">
+![](C:\Users\PC\Desktop\RA_Xu\PanelView\panelviewstata-master-stata\reports\05report_mhy\graph\Graph30.png)
 
