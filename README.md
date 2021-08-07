@@ -23,7 +23,7 @@ __Table of Contents__
 The general syntax of the package can be summarized as:
 
 ```
-panelView Y D X [if] [in] , 		///
+panelView Y D X [if] [in], 			///
 	I(varname) T(varname numeric)	///
 	[        						///
 	TYPE(string)					///
