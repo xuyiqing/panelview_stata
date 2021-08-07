@@ -176,3 +176,75 @@ panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title
 use simdata.dta, replace
 range x 0 1
 panelView Y x, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title("Raw Data") prepost(off) continuoustreat // continuoustreat
+
+
+
+
+/***** 11. Plot D and Y against time in the same graph by each unit *****/
+
+/***** 1. Y: continuous; D: dummy *****/
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10)
+
+use capacity.dta, clear 
+panelView lnpop demo if country >= 1 & country <= 24, i(country) t(year) xlabdist(20)
+
+/***** 2. Y: Discrete; D: dummy *****/
+use simdata.dta, replace
+panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4)
+
+
+/***** 3. Y: continuous; D: continuous *****/
+use capacity.dta, clear 
+panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat prepost(off) xlabdist(20)
+
+/***** 4. Y: Discrete; D: continuous *****/
+use simdata.dta, replace
+range x 0 1
+panelView Y x if id >= 101 & id <= 112, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4)
+
+
+
+/***** Line the discete treatment *****/
+* Y: continuous; D: dummy 
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) linediscretreat
+
+*Y: Discrete; D: dummy
+use simdata.dta, replace
+panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) linediscretreat
+
+
+
+/***** 12. Plot mean D and Y against time in the same graph *****/
+/***** 1. Y: continuous; D: dummy *****/
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) allunitsplot
+
+use capacity.dta, clear 
+panelView lnpop demo, i(country) t(year) xlabdist(10) allunitsplot
+
+/***** 2. Y: Discrete; D: dummy *****/
+use simdata.dta, replace
+panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) allunitsplot
+
+/***** 3. Y: continuous; D: continuous *****/
+use capacity.dta, clear 
+panelView lnpop polity2, i(country) t(year) continuoustreat prepost(off) xlabdist(20) allunitsplot
+
+/***** 4. Y: Discrete; D: continuous *****/
+use simdata.dta, replace
+range x 0 1
+panelView Y x, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) allunitsplot
+
+
+/***** Line the discete treatment *****/
+* Y: continuous; D: dummy 
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) allunitsplot linediscretreat
+
+*Y: Discrete; D: dummy
+use simdata.dta, replace
+panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) allunitsplot linediscretreat
+
+ 

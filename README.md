@@ -8,33 +8,15 @@ We develop this package in the belief that it is always a good idea to understan
 
 **Date:** August 3, 2021
 
-**Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata)) Please report bugs!
+**Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata)) Please report bugs to yiqingxu@stanford.edu or muhongyu@pku.edu.cn!
 
 ------
 
-__Contents__  
+__Table of Contents__  
 
 [TOC]
 
 ------
-
-## 0. Installation
-
-Manual installation takes three simple steps:
-
-1. Download the zip file from: https://github.com/xuyiqing/panelView_stata
-
-2. Unzip the file
-
-3. Type the following commands in your STATA console (the "full_local_path" is your local path of the unzipped file):
-
-   ```
-   . cap ado uninstall fect
-   
-   . net install fect, all replace from(full_local_path)
-   ```
-
-   
 
 ## 1. Syntax
 
@@ -43,8 +25,8 @@ The general syntax of the package can be summarized as:
 ```
 panelView Y D X [if] [in] , 		///
 	I(varname) T(varname numeric)	///
-	TYPE(string)					///
 	[        						///
+	TYPE(string)					///
 	discreteoutcome					///
 	bytiming						///
 	MYCOLor(string)					///
@@ -54,26 +36,30 @@ panelView Y D X [if] [in] , 		///
 	ylabdist(integer 1)				///
 	ignoretreat						///
 	bytreatgroup					///
+	linediscretreat					///
+	allunitsplot					///
 	*								///
 	]
 ```
 
-Where the subcommand can be:
+where the subcommand can be:
 
-| Subcommand                            | Description                                                  |
-| :------------------------------------ | ------------------------------------------------------------ |
-| `Y D X`                               | `varlist` of outcome variable, treatment variable, and covariates. Including covariates may change the plot because of missing values in these covariates. |
-| `if` and `in`                         | If any variable not included in the `varlist` or `i()` / `t()` appears in the `if`/ `in` subcommand, we should add this variable into the  `varlist` following `panelView` command. |
-| `I(varname)` and `T(varname numeric)` | Specify the unit (group) and time indicators.                |
-| `TYPE(string)`                        | Use `type(treat)` to plot treatments; `type(outcome)` to plot outcomes. |
-| `discreteoutcome`                     | Plot the discrete outcome variable.                          |
-| `bytiming`                            | Sort units by the timing of receiving the treatment (then by the total number of periods exposed to the treatment). |
-| `MYCOLor(string)`                     | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). Default is  `Reds`. |
-| `PREpost(off)`                        | Not distinguish the pre- and post-treatment periods for treated units. |
-| `continuoustreat`                     | Plot the continuous treatment variable. If it is combined with `type(outcome)`, the figure would be the same as ignoring treatment. |
-| `xlabdist` and `ylabdist`             | Change gaps between labels on the x- and y-axes. Default is 1. |
-| `ignoretreat`                         | Omit the treatment indicator.                                |
-| `bytreatgroup`                        | Put each unit into different treatment groups, then plot respectively. |
+| Subcommand                | Description                                                  |
+| :------------------------ | ------------------------------------------------------------ |
+| `Y D X`                   | `varlist` of outcome variable, treatment variable, and covariates. Including covariates may change the plot because of missing values in these covariates. |
+| `if` and `in`             | If any variable not included in the `varlist` or `i()` / `t()` appears in the `if`/ `in` subcommand, we should add this variable into the  `varlist` following `panelView` command. |
+| `I()` and `T()`           | Specify the unit (group) and time indicators.                |
+| `TYPE()`                  | Use `type(treat)` to plot treatments; `type(outcome)` to plot outcomes. If not specify this option, we plot outcome and treatment against time in the same graph. |
+| `discreteoutcome`         | Plot the discrete outcome variable.                          |
+| `bytiming`                | Sort units by the timing of receiving the treatment (then by the total number of periods exposed to the treatment). |
+| `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). Default is  `Reds`. |
+| `PREpost(off)`            | Not distinguish the pre- and post-treatment periods for treated units. |
+| `continuoustreat`         | Plot the continuous treatment variable. If it is combined with `type(outcome)`, the figure would be the same as ignoring treatment. |
+| `xlabdist` and `ylabdist` | Change gaps between labels on the x- and y-axes. Default is 1. |
+| `ignoretreat`             | Omit the treatment indicator.                                |
+| `bytreatgroup`            | Put each unit into different treatment groups, then plot respectively. |
+| `linediscretreat`         | To visualize the zero level with discrete treatment, use line plot instead of bar plot when plot D and Y against time in the same graph. |
+| `allunitsplot`            | Plot mean D and Y against time in the same graph.            |
 
 
 
@@ -452,3 +438,146 @@ panelView turnout, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout")
 
 <img src="./graph/Graph27.png">
 
+## 8. Plotting Y and D against time in the same graph
+
+Visualize time series of the outcome and treatment for each unit in one figure by not specifying `type()`. For continuous treatment, we use line plot; for discrete treatment, we use bar plot. If one want to visualize the zero line with discrete treatment, please add `linediscretreat`. No matter the outcome is continuous or discrete, line plot is applied. The left y axis indicates outcome label, and the right y axis indicates treatment label.
+
+### 8.1 Plot by each unit
+
+Below are two examples with continuous outcome and discrete treatment variable. We arrange four subgraphs in one row:
+
+```
+/***** 1. Y: continuous; D: dummy *****/
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10)
+```
+
+<img src="./graph/Graph37.png">
+
+```
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10)
+```
+
+<img src="./graph/Graph38.png">
+
+If the outcome is discrete, we can plot outcome and treatment against time in the same figure by indicating `discreteoutcome`:
+
+```
+/***** 2. Y: Discrete; D: dummy *****/
+use simdata.dta, replace
+panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4)
+```
+
+<img src="./graph/Graph39.png">
+
+When treatment variable is continuous, we need to add the subcommands of `continuoustreat` and `prepost(off)`: 
+
+```
+/***** 3. Y: continuous; D: continuous *****/
+use capacity.dta, clear 
+panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat prepost(off) xlabdist(20)
+```
+
+<img src="./graph/Graph40.png">
+
+In the last situation, we plot discrete outcome and continuous treatment by options `continuoustreat` and `discreteoutcome`:
+
+```
+/***** 4. Y: Discrete; D: continuous *****/
+use simdata.dta, replace
+range x 0 1
+panelView Y x if id >= 101 & id <= 112, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4)
+```
+
+<img src="./graph/Graph41.png">
+
+To visualize the zero level with discrete treatment, we add `linediscretreat` to plot treatment lines instead of bars: 
+
+```
+/***** Line the discete treatment *****/
+* Y: continuous; D: dummy 
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) linediscretreat
+```
+
+<img src="./graph/Graph42.png">
+
+```
+*Y: Discrete; D: dummy
+use simdata.dta, replace
+panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) linediscretreat
+```
+
+<img src="./graph/Graph43.png">
+
+### 8.2 Plot average time series for all units
+
+We plot mean D and Y against time in the same graph by option `allunitsplot`.
+
+With continuous outcome and discrete treatment variable, here are two examples:
+
+```
+/***** 1. Y: continuous; D: dummy *****/
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) allunitsplot
+```
+
+<img src="./graph/Graph44.png">
+
+```
+use capacity.dta, clear 
+panelView lnpop demo, i(country) t(year) xlabdist(10) allunitsplot
+```
+
+<img src="./graph/Graph45.png">
+
+With discrete outcome and treatment:
+
+```
+/***** 2. Y: Discrete; D: dummy *****/
+use simdata.dta, replace
+panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) allunitsplot
+```
+
+<img src="./graph/Graph46.png">
+
+With continuous outcome and treatment:
+
+```
+/***** 3. Y: continuous; D: continuous *****/
+use capacity.dta, clear 
+panelView lnpop polity2, i(country) t(year) continuoustreat prepost(off) xlabdist(20) allunitsplot
+```
+
+<img src="./graph/Graph47.png">
+
+With discrete outcome and continuous treatment:
+
+```
+/***** 4. Y: Discrete; D: continuous *****/
+use simdata.dta, replace
+range x 0 1
+panelView Y x, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) allunitsplot
+```
+
+<img src="./graph/Graph48.png">
+
+Similarly, to visualize the zero level with discrete treatment, we add `linediscretreat` to plot treatment lines instead of bars: 
+
+```
+/***** Line the discete treatment *****/
+* Y: continuous; D: dummy 
+use turnout.dta, clear
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) allunitsplot linediscretreat
+```
+
+<img src="./graph/Graph49.png">
+
+```
+*Y: Discrete; D: dummy
+use simdata.dta, replace
+panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) allunitsplot linediscretreat
+```
+
+<img src="./graph/Graph50.png">

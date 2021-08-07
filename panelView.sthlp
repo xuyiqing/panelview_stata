@@ -14,7 +14,7 @@
 {p 8 18 2}
 {cmdab:panelView} {it:{help varname:Y D}} {it:{help varlist:X}}
 {ifin} 
-{cmd:,} {opt I(varname)} {opt T(varname numeric)} {opt TYPE(string)}
+{cmd:,} {opt I(varname)} {opt T(varname numeric)}
 [{it:options}]
 
 {synoptset 23 tabbed}{...}
@@ -23,12 +23,13 @@
 
 {syntab:Main}
 {synopt:{opt Y D X}}{it:{help varlist}} of outcome variable, treatment variable, and covariates. Including covariates may change the plot because of missing values in these covariates{p_end}
-{synopt:{opt i(varname)}}Specify the unit (group) indicators{p_end}
-{synopt:{opt t(varname numeric)}}Specify the time indicators{p_end}
-{synopt:{opt type(string)}}Use {cmd:type(treat)} to plot treatments or {cmd:type(outcome)} to plot outcomes{p_end}
+{synopt:{opt i(varname)}}Specify the unit (group) indicator{p_end}
+{synopt:{opt t(varname numeric)}}Specify the time indicator{p_end}
+
 
 {syntab:Advanced}
 {synopt:{opt [if] [in]}}If any variable not included in the {cmd:varlist} or {cmd: i()} / {cmd: t()} appears in the {cmd:if}/ {cmd:in} subcommand, we should add this variable into the {cmd:varlist} following {cmd:panelView} command{p_end}
+{synopt:{opt type(string)}}Use {cmd:type(treat)} to plot treatments or {cmd:type(outcome)} to plot outcomes. If not specify this option, we plot outcome and treatment against time in the same graph{p_end}
 {synopt:{opt discreteoutcome}}Plot the discrete outcome variable{p_end}
 {synopt:{opt bytiming}}Sort units by the timing of receiving the treatment (then by the total number of periods exposed to the treatment){p_end}
 {synopt:{opt mycol:or(string)}}Change the color schemes; click {it:{help colorpalette:here}} for sequential colors (3-9 colors). Default is {cmd:Reds}{p_end} 
@@ -37,6 +38,8 @@
 {synopt:{opt xlabdist(integer)}}Change gaps between labels on the x-axis.{cmd: ylabdist} Change gaps between labels on the y-axis. Default is {cmd: 1}{p_end}
 {synopt:{opt ignoretreat}}Omit the treatment indicator{p_end}
 {synopt:{opt bytreatgroup}}Put each unit into different treatment groups, then plot respectively{p_end}
+{synopt:{opt linediscretreat}}To visualize the zero level with discrete treatment, use line plot instead of bar plot when plot D and Y against time in the same graph{p_end}
+{synopt:{opt allunitsplot}}Plot mean D and Y against time in the same graph{p_end}
 {synopt:{opt *}}
 
 {synoptline}
@@ -48,7 +51,13 @@
 {title:Description}
 
 {pstd}
-{opt panelView} has two main functionalities: (1) it visualizes the treatment and missing-value statuses of each observation in a panel/time-series-cross-sectional (TSCS) dataset; and (2) it plots the outcome variable (either continuous or discrete) in a time-series fashion. We develop this package in the belief that it is always a good idea to understand your raw data better before conducting statistical analyses.{p_end}
+{opt panelView} has two main functionalities: {p_end}
+{pstd}
+(1) it visualizes the treatment and missing-value statuses of each observation in a panel/time-series-cross-sectional (TSCS) dataset; {p_end}
+{pstd}
+(2) it plots the outcome variable (either continuous or discrete) in a time-series fashion. {p_end}
+{pstd}
+We develop this package in the belief that it is always a good idea to understand your raw data better before conducting statistical analyses.{p_end}
 
 {title:Examples}
 
@@ -130,6 +139,29 @@
 {p 4 8 2}{stata "panelView turnout, i(abb) t(year) type(outcome) ylabel(0 (25) 100) ignoretreat":. panelView turnout, i(abb) t(year) type(outcome) ylabel(0 (25) 100) ignoretreat}{p_end}
 
 {p 6 6 2}Plot an outcome variable (or any variable) in a panel dataset by {cmd:type(outcome)} and {cmd:ignoretreat}. {p_end}
+
+
+{pstd}Plotting Y and D against time in the same graph{p_end}
+
+{pstd}Plot by each unit{p_end}
+{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
+{p 4 8 2}{stata "panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10)":. panelView turnout policy_edr policy_mail_in policy_motor if abb <= 12, i(abb) t(year) xlabdist(10)}{p_end}
+
+{p 6 6 2}Visualize time series of the outcome and treatment for each unit in one figure by not specifying {cmd:type()}. For continuous treatment, we use line plot; for discrete treatment, we use bar plot. {p_end} 
+{p 6 6 2}No matter the outcome is continuous or discrete, line plot is applied. The left y axis indicates outcome label, and the right y axis indicates treatment label. {p_end}
+
+{pstd}Line the discrete treatment{p_end}
+{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
+{p 4 8 2}{stata "panelView turnout policy_edr if abb <= 12, i(abb) t(year) xlabdist(10) linediscretreat":. panelView turnout policy_edr if abb <= 12, i(abb) t(year) xlabdist(10) linediscretreat}{p_end}
+
+{p 6 6 2}To visualize the zero level with discrete treatment, we add {cmd:linediscretreat} to plot treatment lines instead of bars.{p_end} 
+
+{pstd}Plot average time series for all units{p_end}
+{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
+{p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) xlabdist(7) allunitsplot":. panelView turnout policy_edr, i(abb) t(year) xlabdist(7) allunitsplot}{p_end}
+
+{p 6 6 2}Plot mean D and Y against time in the same graph. {p_end}
+
 
 {title:Authors}
 

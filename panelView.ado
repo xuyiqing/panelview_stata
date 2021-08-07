@@ -10,8 +10,8 @@ program define panelView
 	version 15.1
 	syntax varlist(min = 1 numeric) [if] [in] , ///
 	I(varname) T(varname numeric)	///
+	[								///
 	TYPE(string)					///
-	[        						///
 	discreteoutcome					///
 	bytiming						///
 	MYCOLor(string)					///
@@ -21,6 +21,8 @@ program define panelView
 	ylabdist(integer 1)				///
 	ignoretreat						///
 	bytreatgroup					///
+	linediscretreat					///
+	allunitsplot					///
 	*								///
 	]
 	
@@ -89,7 +91,7 @@ program define panelView
 		}
 	}
 
-    set trace off 
+    set trace off
 
 	preserve 
 	tempfile backup
@@ -171,9 +173,9 @@ program define panelView
 	tempvar gcontrol
 	if ("`continuoustreat'" != "" & "`type'" == "outcome") { 
 			gen `gcontrol' = 1 
-			} 
-			else {
-    		if ("`ignoretreat'" != "") { 
+	}
+	else {
+    if ("`ignoretreat'" != "") { 
 			gen `gcontrol' = 1 
 			} 
 			else { 
@@ -622,6 +624,127 @@ program define panelView
 			}
 		tw `gcom' plotr(fc(white) margin(zero)) ||`sc' `options'
 	}
-	
+
+
+
+
+
+
+	else if ("`type'" == ""){
+
+		qui sum `newtime', mean
+		local xlabel `"xlabel(`r(min)'(`xlabdist')`r(max)', valuelabel)"'
+
+		qui levelsof `treat' if `touse' , loc (levstreat)
+		qui levelsof `outcome' if `touse' , loc (levsoutcome)
+
+		if "`allunitsplot'" != "" {
+		// 3.1 Plot D and Y against time in the same graph (average D and Y by year):
+			collapse (mean) `outcome' `treat', by(`newtime')
+			if ("`discreteoutcome'" == "" & "`continuoustreat'" == "") { //continuous Y, discrete D
+				if "`linediscretreat'" == "" {
+					twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
+					|| bar `treat' `newtime', yaxis(2) color(orange%25) xtitle("") `options'
+				}
+				else if "`linediscretreat'" != "" {
+					twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
+					|| line `treat' `newtime', yaxis(2) color(orange) xtitle("") `options'
+				}
+			}
+			else if ("`discreteoutcome'" != "" & "`continuoustreat'" == "") { //discrete Y, discrete D
+				if "`linediscretreat'" == "" {
+					twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
+					|| bar `treat' `newtime', yaxis(2) color(orange%25) xtitle("") `options'
+				}
+				else if "`linediscretreat'" != "" {
+					twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
+					|| line `treat' `newtime', yaxis(2) color(orange) xtitle("") `options'
+				}
+			}
+			else if ("`discreteoutcome'" == "" & "`continuoustreat'" != "") { //continuous Y, continuous D
+				twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
+				|| line `treat' `newtime', yaxis(2) color(orange) xtitle("") `options'
+			}
+			else if ("`discreteoutcome'" != "" & "`continuoustreat'" != "") { //discrete Y, continuous D
+				twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
+				|| line `treat' `newtime', yaxis(2) color(orange) xtitle("") `options'
+			}
+		}
+
+		else {
+		// 3.2 Plot D and Y against time in the same graph by each unit:
+		cap label list `i' 
+		if "`r(k)'" == "" {
+			tempvar labeli
+			qui tostring `i', gen(`labeli')
+			labmask `i', val(`labeli') 
+		}
+
+		qui levelsof `ids' if `touse' , loc (levsids) 
+
+		local graphs ""
+		if ("`discreteoutcome'" == "" & "`continuoustreat'" == "") { //continuous Y, discrete D
+			foreach x of loc levsids {
+				local lx: label (`i') `x'
+				qui levelsof `treat' if `touse' , loc (levstreat)
+				if "`linediscretreat'" == "" {
+					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ///
+					|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color(orange%25) lw(none) `xlabel' ///
+					||, ylabel(`levstreat', valuelabel axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+					local graphs "`graphs' graph_`x'"
+				}
+				else if "`linediscretreat'" != "" {
+					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ///
+					|| line `treat' `newtime' if `ids' == `x', yaxis(2) color(orange) `xlabel' ///
+					||, ylabel(`levstreat', valuelabel axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+					local graphs "`graphs' graph_`x'"
+				}
+			}
+		}
+		else if ("`discreteoutcome'" != "" & "`continuoustreat'" == "") { //discrete Y, discrete D
+			foreach x of loc levsids {
+				local lx: label (`i') `x'
+				qui levelsof `treat' if `touse' , loc (levstreat) 
+				qui levelsof `outcome' if `touse' , loc (levsoutcome) 
+				if "`linediscretreat'" == "" {
+					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ///
+					|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color(orange%25) lw(none) `xlabel' ylabel(`levstreat', valuelabel axis(2)) ///
+					||, xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+					local graphs "`graphs' graph_`x'"
+				}
+				else if "`linediscretreat'" != "" {
+					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ///
+					|| line `treat' `newtime' if `ids' == `x', yaxis(2) color(orange) `xlabel' ylabel(`levstreat', valuelabel axis(2)) ///
+					||, xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+					local graphs "`graphs' graph_`x'"
+				}
+			}
+		}
+		else if ("`discreteoutcome'" == "" & "`continuoustreat'" != "") { //continuous Y, continuous D
+			foreach x of loc levsids {
+				local lx: label (`i') `x'
+				twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ///
+				|| line `treat' `newtime' if `ids' == `x', yaxis(2) color(orange) `xlabel' ///
+				||, xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+				local graphs "`graphs' graph_`x'"
+			}
+		}
+		else if ("`discreteoutcome'" != "" & "`continuoustreat'" != "") { //discrete Y, continuous D
+			foreach x of loc levsids {
+				local lx: label (`i') `x'
+				qui levelsof `outcome' if `touse' , loc (levsoutcome) 
+				twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) ylabel(`levsoutcome', valuelabel axis(1)) color(edkblue) `xlabel' ///
+				|| line `treat' `newtime' if `ids' == `x', yaxis(2) color(orange) `xlabel' ///
+				||, xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+				local graphs "`graphs' graph_`x'"
+			}
+		}
+		
+		tokenize graphs
+		loc graph_1 `2'
+		grc1leg `graphs', legendfrom(`graph_1') ycommon cols(4) `options'
+
+		}
+	}
 	restore
 end
