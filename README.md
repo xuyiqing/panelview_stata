@@ -455,8 +455,8 @@ panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12
 <img src="./graph/Graph37.png">
 
 ```
-use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10)
+use capacity.dta, clear 
+panelView lnpop demo if country >= 1 & country <= 24, i(country) t(year) xlabdist(20)
 ```
 
 <img src="./graph/Graph38.png">
