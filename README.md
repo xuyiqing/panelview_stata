@@ -6,9 +6,11 @@ We develop this package in the belief that it is always a good idea to understan
 
 ------
 
-**Date:** August 3, 2021
+**Date:** August 18, 2021
 
-**Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata)) Please report bugs to yiqingxu@stanford.edu or muhongyu@pku.edu.cn!
+**Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata)) 
+
+Please report bugs to yiqingxu@stanford.edu or muhongyu@pku.edu.cn!
 
 ------
 
@@ -25,8 +27,8 @@ The general syntax of the package can be summarized as:
 ```
 panelView Y D X [if] [in], 			///
 	I(varname) T(varname numeric)	///
-	[        						///
 	TYPE(string)					///
+	[        						///
 	discreteoutcome					///
 	bytiming						///
 	MYCOLor(string)					///
@@ -36,8 +38,11 @@ panelView Y D X [if] [in], 			///
 	ylabdist(integer 1)				///
 	ignoretreat						///
 	bytreatgroup					///
-	linediscretreat					///
-	allunitsplot					///
+	style(string)					///
+	byunit							///
+	theme(string)					///
+	linewidth(string)				///
+	connectedline					///
 	*								///
 	]
 ```
@@ -49,25 +54,28 @@ where the subcommand can be:
 | `Y D X`                   | `varlist` of outcome variable, treatment variable, and covariates. Including covariates may change the plot because of missing values in these covariates. |
 | `if` and `in`             | If any variable not included in the `varlist` or `i()` / `t()` appears in the `if`/ `in` subcommand, we should add this variable into the  `varlist` following `panelView` command. |
 | `I()` and `T()`           | Specify the unit (group) and time indicators.                |
-| `TYPE()`                  | Use `type(treat)` to plot treatments; `type(outcome)` to plot outcomes. If not specify this option, we plot outcome and treatment against time in the same graph. |
+| `TYPE()`                  | Use `type(treat)` to plot treatments, `type(outcome)` to plot outcomes, or `type(bivar)` to plot outcome and treatment against time in the same graph. |
 | `discreteoutcome`         | Plot the discrete outcome variable.                          |
 | `bytiming`                | Sort units by the timing of receiving the treatment (then by the total number of periods exposed to the treatment). |
 | `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). Default is  `Reds`. |
 | `PREpost(off)`            | Not distinguish the pre- and post-treatment periods for treated units. |
 | `continuoustreat`         | Plot the continuous treatment variable. If it is combined with `type(outcome)`, the figure would be the same as ignoring treatment. |
-| `xlabdist` and `ylabdist` | Change gaps between labels on the x- and y-axes. Default is 1. |
+| `xlabdist` and `ylabdist` | Change integer gaps between labels on the x- and y-axes. Default is 1. |
 | `ignoretreat`             | Omit the treatment indicator.                                |
 | `bytreatgroup`            | Put each unit into different treatment groups, then plot respectively. |
-| `linediscretreat`         | To visualize the zero level with discrete treatment, use line plot instead of bar plot when plot D and Y against time in the same graph. |
-| `allunitsplot`            | Plot mean D and Y against time in the same graph.            |
+| `style(line)`             | To visualize the zero level with discrete treatment, use line plot instead of bar plot when plot D and Y against time in the same graph. |
+| `byunit`                  | Plot D and Y against time by each unit in the same graph in `type(bivar)`. |
+| `theme(bw)`               | Use the black and white theme (default when specified `type(bivar)`). |
+| `linewidth()`             | Set the line width in `type(bivar)`  (default is `medium`).  |
+| `connectedline`           | Apply connected scatter plot in `type(bivar)`.               |
 
-
+------
 
 ## 2. Plotting Treatment Conditions
 
 First, we show how to visualize the dichotomous treatment conditions in a panel dataset. The treatment may  switch on and off or have missing values.
 
-### 2.1 Two Treatment Conditions
+### 2.1 Two treatment conditions
 
 Using the `turnout` dataset (a balanced panel), we show the treatment status of Election Day Registration (EDR) in each state in a given year ([Xu 2017](http://dx.doi.org/10.1017/pan.2016.2)). We can use the `title` option to change the title of the plot and change the titles of x- and y-axes through `xtitle` and `ytitle`, respectively. For DID-type TSCS data with a dichotomous treatment indicator, we can stop distinguish the pre- and post-treatment periods for treated units by specifying `prepost(off)`.
 
@@ -180,9 +188,11 @@ panelView lnpop demo lngdp ccodeid if ccodeid >= 26 & ccodeid <= 51, i(ccode) t(
 
 <img src="./graph/Graph12.png">
 
+------
+
 ## 3. Ignoring Treatment Conditions
 
-### 3.1 `ignoretreat` Subcommand
+### 3.1 `ignoretreat` subcommand
 
 Omit the treatment variable in a `type(treat)` plot, in which case, the plot will show missing (the white area) and non-missing values only.
 
@@ -217,18 +227,18 @@ panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Regime Typ
 
 <img src="./graph/Graph15.png">
 
-### 3.4 Plotting outcome & Continuous Treatment / More Than Two Treatment Levels
+### 3.4 Plotting outcome & Continuous treatment / More than two treatment levels
 
 If the treatment indicator has more than 2 treatment levels or is a continuous variable, then treatment status will not be shown on the `type(outcome)` plot. In other words, `Type(outcome)` combined with `continuoustreat` or > 2 treatment levels is the same as  `ignoretreat`.
 
-#### 3.4.1 Continuous Outcomes
+#### 3.4.1 Continuous outcomes
 
-With a continuous treatment variable (e.g. `polity2`), the treatment status will not be shown on the `type(outcome)` plot: 
+With a continuous treatment variable (e.g. `polity2`), the treatment status will not be shown on the `type(outcome)` plot. We also indicate `theme(bw)` for black and white color style.
 
 ```
 use capacity.dta, clear 
 * Continuous Outcome: Capacity; Continuoustreat: polity2
-panelView Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring Stata Capacity") legend(off)
+panelView Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring Stata Capacity") legend(off) theme(bw)
 ```
 
 <img src="./graph/Graph31.png">
@@ -252,7 +262,7 @@ panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring 
 
 ```
 
-####  3.4.2 Discrete Outcomes
+####  3.4.2 Discrete outcomes
 
 When the number of treatment levels is more than two, the treatment status will not be shown on the `type(outcome)` plot: 
 
@@ -275,12 +285,12 @@ panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title
 ```
 use simdata.dta, replace
 range x 0 1
-panelView Y x, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title("Raw Data") prepost(off) continuoustreat // continuous treatment
+panelView Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") prepost(off) continuoustreat theme(bw) // continuous treatment & black and white theme
 ```
 
+------
 
-
-## 4. More than Two Treatment Conditions
+## 4. More Than Two Treatment Conditions
 
 ### 4.1 Treatment level = 3
 
@@ -347,11 +357,13 @@ panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Re
 
 <img src="./graph/Graph21.png">
 
+------
+
 ## 5. Continuous Outcomes
 
 The second functionality of **panelView** is to show the raw outcome variable of a panel dataset in a time-series fashion. The syntax is very similar except that we need to specify `type(outcome)`. Different colors represent different treatment conditions.
 
-### 5.1 Continuous Outcomes
+### 5.1 Continuous outcomes
 
 Note that we paint the period right before when the treatment begin as treated period. Different with `type(treat)`, `type(outcome)`does not need `xlabdist` and `ylabdist`. If needed, we should use  `xlabel` and `ylabel` instead.
 
@@ -403,11 +415,13 @@ panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(ou
 
 <img src="./graph/Graph26.png">
 
+------
+
 ## 6. Discrete Outcomes 
 
 We can accommodate discrete variables by setting `discreteoutcome`. Below is an example using the `simdata` dataset, in which the outcome variable takes three values: 0, 1, and 2.
 
-### 6.1 Discrete Outcomes
+### 6.1 Discrete outcomes
 
 ```
 use simdata.dta, replace
@@ -427,7 +441,9 @@ panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteout
 
 <img src="./graph/Graph30.png">
 
-## 7. Plotting any variable in a panel dataset
+------
+
+## 7. Plotting Any Variable In Panel Dataset
 
 Plot an outcome variable (or any variable) in a panel dataset by `type(outcome)` and `ignoretreat`: 
 
@@ -438,48 +454,55 @@ panelView turnout, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout")
 
 <img src="./graph/Graph27.png">
 
-## 8. Plotting Y and D against time in the same graph
+------
 
-Visualize time series of the outcome and treatment for each unit in one figure by not specifying `type()`. For continuous treatment, we use line plot; for discrete treatment, we use bar plot. If one want to visualize the zero line with discrete treatment, please add `linediscretreat`. No matter the outcome is continuous or discrete, line plot is applied. The left y axis indicates outcome label, and the right y axis indicates treatment label.
+## 8. Plotting Y And D Time Series In One Graph
 
-### 8.1 Plot by each unit
+Visualize time series of the outcome and treatment for each unit in one figure by specifying `type = "bivar"`. For continuous treatment, we use line plot; for discrete treatment, we use bar plot. To visualize the zero line with discrete treatment, please add `style = "line"`. No matter the outcome is continuous or discrete, line plot is applied. The left y axis indicates outcome label, and the right y axis indicates treatment label.
 
-Below are two examples with continuous outcome and discrete treatment variable. We arrange four subgraphs in one row:
+### 8.1 Plot average time series for all units
+
+This section plots mean D and Y against time in the same graph.
+
+With continuous outcome and discrete treatment, here are two examples. For the first example, `connectedline` means connected scatter plot instead of line plot (default). We can plot connected scatters by `connectedline` and specify the symbol size by `msize()`: 
 
 ```
 /***** 1. Y: continuous; D: dummy *****/
 use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10)
+*label the first and second y axes
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) type(bivar) ylabel(0 (20) 100) ylabel(0 (0.1) 0.5, axis(2)) connectedline msize(*0.5)
 ```
 
-<img src="./graph/Graph37.png">
+<img src="./graph/Graph44.png">
+
+If not apply the default black and white theme, we can set option `mycolor()`. Besides, `linewidth(medthick)` is to change the line width from the default `medium` to `medthick`:
 
 ```
 use capacity.dta, clear 
-panelView lnpop demo if country >= 1 & country <= 24, i(country) t(year) xlabdist(20)
+panelView lnpop demo, i(country) t(year) xlabdist(10) type(bivar) mycolor(Reds) linewidth(medthick)
 ```
 
-<img src="./graph/Graph38.png">
+<img src="./graph/Graph45.png">
 
-If the outcome is discrete, we can plot outcome and treatment against time in the same figure by indicating `discreteoutcome`:
+If the outcome is discrete, we can plot outcome and treatment against time in the same figure by `discreteoutcome`:
 
 ```
 /***** 2. Y: Discrete; D: dummy *****/
 use simdata.dta, replace
-panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4)
+panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) type(bivar)
 ```
 
-<img src="./graph/Graph39.png">
+<img src="./graph/Graph46.png">
 
 When treatment variable is continuous, we need to add the subcommands of `continuoustreat` and `prepost(off)`: 
 
 ```
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat prepost(off) xlabdist(20)
+panelView lnpop polity2, i(country) t(year) continuoustreat prepost(off) xlabdist(20) type(bivar)
 ```
 
-<img src="./graph/Graph40.png">
+<img src="./graph/Graph47.png">
 
 In the last situation, we plot discrete outcome and continuous treatment by options `continuoustreat` and `discreteoutcome`:
 
@@ -487,70 +510,72 @@ In the last situation, we plot discrete outcome and continuous treatment by opti
 /***** 4. Y: Discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelView Y x if id >= 101 & id <= 112, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4)
+panelView Y x, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar)
 ```
 
-<img src="./graph/Graph41.png">
+<img src="./graph/Graph48.png">
 
-To visualize the zero level with discrete treatment, we add `linediscretreat` to plot treatment lines instead of bars: 
+To visualize the zero level with discrete treatment, we add `style(line)` to plot treatment lines instead of bars: 
 
 ```
 /***** Line the discete treatment *****/
 * Y: continuous; D: dummy 
 use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) linediscretreat
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) style(line) type(bivar)
 ```
 
-<img src="./graph/Graph42.png">
+<img src="./graph/Graph49.png">
+
+Apply connected scatter plot by `connectedline`: 
 
 ```
 *Y: Discrete; D: dummy
 use simdata.dta, replace
-panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) linediscretreat
+panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) style(line) type(bivar) connectedline
 ```
 
-<img src="./graph/Graph43.png">
+<img src="./graph/Graph50.png">
 
-### 8.2 Plot average time series for all units
 
-We plot mean D and Y against time in the same graph by option `allunitsplot`.
 
-With continuous outcome and discrete treatment variable, here are two examples:
+### 8.2 Plot by each unit
+
+We plot D and Y against time by each unit by option `byunit`. Below are two examples with continuous outcome and discrete treatment variable. We arrange four subgraphs in one row:
 
 ```
 /***** 1. Y: continuous; D: dummy *****/
 use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) allunitsplot
+panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) type(bivar) byunit 
 ```
 
-<img src="./graph/Graph44.png">
+<img src="./graph/Graph37.png">
 
 ```
 use capacity.dta, clear 
-panelView lnpop demo, i(country) t(year) xlabdist(10) allunitsplot
+panelView lnpop demo if country >= 1 & country <= 24, i(country) t(year) xlabdist(20) type(bivar) byunit
 ```
 
-<img src="./graph/Graph45.png">
+<img src="./graph/Graph38.png">
 
 With discrete outcome and treatment:
 
 ```
 /***** 2. Y: Discrete; D: dummy *****/
 use simdata.dta, replace
-panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) allunitsplot
+panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) type(bivar) byunit
 ```
 
-<img src="./graph/Graph46.png">
+<img src="./graph/Graph39.png">
 
 With continuous outcome and treatment:
 
 ```
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelView lnpop polity2, i(country) t(year) continuoustreat prepost(off) xlabdist(20) allunitsplot
+panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat prepost(off) xlabdist(20) type(bivar) byunit
 ```
 
-<img src="./graph/Graph47.png">
+<img src="./graph/Graph40.png">
 
 With discrete outcome and continuous treatment:
 
@@ -558,26 +583,28 @@ With discrete outcome and continuous treatment:
 /***** 4. Y: Discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelView Y x, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) allunitsplot
+panelView Y x if id >= 101 & id <= 112, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar) byunit
 ```
 
-<img src="./graph/Graph48.png">
+<img src="./graph/Graph41.png">
 
-Similarly, to visualize the zero level with discrete treatment, we add `linediscretreat` to plot treatment lines instead of bars: 
+To visualize the zero level with discrete treatment, add `style(line)`: 
 
 ```
 /***** Line the discete treatment *****/
 * Y: continuous; D: dummy 
 use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) allunitsplot linediscretreat
+panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(line) type(bivar) byunit
 ```
 
-<img src="./graph/Graph49.png">
+<img src="./graph/Graph42.png">
+
+Apply connected scatter plot: 
 
 ```
 *Y: Discrete; D: dummy
 use simdata.dta, replace
-panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) allunitsplot linediscretreat
+panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) style(line) type(bivar) byunit connectedline
 ```
 
-<img src="./graph/Graph50.png">
+<img src="./graph/Graph43.png">

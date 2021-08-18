@@ -1,6 +1,6 @@
 /*
 Version 0.1
-Aug 03 2021
+Aug 17 2021
 Yiqing Xu, Hongyu Mou
 */
 
@@ -21,8 +21,11 @@ program define panelView
 	ylabdist(integer 1)				///
 	ignoretreat						///
 	bytreatgroup					///
-	linediscretreat					///
-	allunitsplot					///
+	style(string)					///
+	byunit							///
+	theme(string)					///
+	linewidth(string)				///
+	connectedline					///
 	*								///
 	]
 	
@@ -199,7 +202,7 @@ program define panelView
 					exit 198
 					}
 					else {
-						if (`numlevstreat' >= 5) { // If the number of treatment levels >= 5, need to combine with Continuoustreat
+						if (`numlevstreat' >= 5) {
 						if ( "`continuoustreat'" == "") {
 							di as err " If the number of treatment levels >= 5, need to combine with Continuoustreat"
 							exit 198
@@ -213,7 +216,7 @@ program define panelView
 			}
 			}
 			}	
-	
+
 	sort `ids' `tunit' 
 
 	//sort by time of first treatment
@@ -334,6 +337,17 @@ program define panelView
 	if (`"`mycolor'"' != "") {
 		colorpalette `mycolor' , n(`numlevsplot') nograph
 		
+	}
+
+	if "`theme'" == "bw" {
+		colorpalette Greys , n(`numlevsplot') nograph
+	}
+
+	if (`"`mycolor'"' != "Greys" & `"`mycolor'"' != "") { 
+		if ( "`theme'" == "bw") {
+			di as err " If mycolor is not Greys, mycolor cannot combine with theme(bw)"
+			exit 198
+		}
 	}
 	
 	qui return list
@@ -629,8 +643,32 @@ program define panelView
 
 
 
+	else if ("`type'" == "bivar"){
+		
+		if (`"`mycolor'"' != "") {
+			colorpalette `mycolor' , n(2) nograph
+			loc y2color = r(p1)
+			loc y1color = r(p2)
+		}
+		else {
+			loc y1color = "0 0 0"
+			loc y2color = "144 144 144"
+		}
+		
 
-	else if ("`type'" == ""){
+		if ("`linewidth'" == "") {
+			loc linewide = "medium"
+		}
+		else {
+			loc linewide = "`linewidth'"
+		}
+
+		if "`connectedline'" == ""{
+			loc lineordot = "line"
+		}
+		else {
+			loc lineordot = "connected"
+		}
 
 		qui sum `newtime', mean
 		local xlabel `"xlabel(`r(min)'(`xlabdist')`r(max)', valuelabel)"'
@@ -638,36 +676,36 @@ program define panelView
 		qui levelsof `treat' if `touse' , loc (levstreat)
 		qui levelsof `outcome' if `touse' , loc (levsoutcome)
 
-		if "`allunitsplot'" != "" {
+		if "`byunit'" == "" {
 		// 3.1 Plot D and Y against time in the same graph (average D and Y by year):
 			collapse (mean) `outcome' `treat', by(`newtime')
 			if ("`discreteoutcome'" == "" & "`continuoustreat'" == "") { //continuous Y, discrete D
-				if "`linediscretreat'" == "" {
-					twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
-					|| bar `treat' `newtime', yaxis(2) color(orange%25) xtitle("") `options'
+				if ("`style'" == "") {
+					twoway `lineordot' `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
+					|| bar `treat' `newtime', yaxis(2) color("`y2color'%50") xtitle("") `options'
 				}
-				else if "`linediscretreat'" != "" {
-					twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
-					|| line `treat' `newtime', yaxis(2) color(orange) xtitle("") `options'
+				else if "`style'" == "line" {
+					twoway `lineordot' `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
+					|| `lineordot' `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
 				}
 			}
 			else if ("`discreteoutcome'" != "" & "`continuoustreat'" == "") { //discrete Y, discrete D
-				if "`linediscretreat'" == "" {
-					twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
-					|| bar `treat' `newtime', yaxis(2) color(orange%25) xtitle("") `options'
+				if "`style'" == "" {
+					twoway `lineordot' `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options'  ///
+					|| bar `treat' `newtime', yaxis(2) color("`y2color'%50") xtitle("") `options'
 				}
-				else if "`linediscretreat'" != "" {
-					twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
-					|| line `treat' `newtime', yaxis(2) color(orange) xtitle("") `options'
+				else if "`style'" == "line" {
+					twoway `lineordot' `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
+					|| `lineordot' `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
 				}
 			}
 			else if ("`discreteoutcome'" == "" & "`continuoustreat'" != "") { //continuous Y, continuous D
-				twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
-				|| line `treat' `newtime', yaxis(2) color(orange) xtitle("") `options'
+				twoway `lineordot' `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
+				|| `lineordot' `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
 			}
 			else if ("`discreteoutcome'" != "" & "`continuoustreat'" != "") { //discrete Y, continuous D
-				twoway line `outcome' `newtime', `xlabel' yaxis(1) color(edkblue) ///
-				|| line `treat' `newtime', yaxis(2) color(orange) xtitle("") `options'
+				twoway `lineordot' `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
+				|| `lineordot' `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
 			}
 		}
 
@@ -687,15 +725,15 @@ program define panelView
 			foreach x of loc levsids {
 				local lx: label (`i') `x'
 				qui levelsof `treat' if `touse' , loc (levstreat)
-				if "`linediscretreat'" == "" {
-					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ///
-					|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color(orange%25) lw(none) `xlabel' ///
+				if "`style'" == "" {
+					twoway `lineordot' `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') `options' ///
+					|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
 					||, ylabel(`levstreat', valuelabel axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
 					local graphs "`graphs' graph_`x'"
 				}
-				else if "`linediscretreat'" != "" {
-					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ///
-					|| line `treat' `newtime' if `ids' == `x', yaxis(2) color(orange) `xlabel' ///
+				else if "`style'" == "line" {
+					twoway `lineordot' `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') `options' ///
+					|| `lineordot' `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
 					||, ylabel(`levstreat', valuelabel axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
 					local graphs "`graphs' graph_`x'"
 				}
@@ -706,15 +744,15 @@ program define panelView
 				local lx: label (`i') `x'
 				qui levelsof `treat' if `touse' , loc (levstreat) 
 				qui levelsof `outcome' if `touse' , loc (levsoutcome) 
-				if "`linediscretreat'" == "" {
-					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ///
-					|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color(orange%25) lw(none) `xlabel' ylabel(`levstreat', valuelabel axis(2)) ///
+				if "`style'" == "" {
+					twoway `lineordot' `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) lw(`linewide') `options' ///
+					|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' ylabel(`levstreat', valuelabel axis(2)) `options' ///
 					||, xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
 					local graphs "`graphs' graph_`x'"
 				}
-				else if "`linediscretreat'" != "" {
-					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ///
-					|| line `treat' `newtime' if `ids' == `x', yaxis(2) color(orange) `xlabel' ylabel(`levstreat', valuelabel axis(2)) ///
+				else if "`style'" == "line" {
+					twoway `lineordot' `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) lw(`linewide') `options' ///
+					|| `lineordot' `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' ylabel(`levstreat', valuelabel axis(2)) lw(`linewide') `options' ///
 					||, xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
 					local graphs "`graphs' graph_`x'"
 				}
@@ -723,8 +761,8 @@ program define panelView
 		else if ("`discreteoutcome'" == "" & "`continuoustreat'" != "") { //continuous Y, continuous D
 			foreach x of loc levsids {
 				local lx: label (`i') `x'
-				twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color(edkblue) `xlabel' ///
-				|| line `treat' `newtime' if `ids' == `x', yaxis(2) color(orange) `xlabel' ///
+				twoway `lineordot' `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') `options' ///
+				|| `lineordot' `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
 				||, xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
 				local graphs "`graphs' graph_`x'"
 			}
@@ -733,8 +771,8 @@ program define panelView
 			foreach x of loc levsids {
 				local lx: label (`i') `x'
 				qui levelsof `outcome' if `touse' , loc (levsoutcome) 
-				twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) ylabel(`levsoutcome', valuelabel axis(1)) color(edkblue) `xlabel' ///
-				|| line `treat' `newtime' if `ids' == `x', yaxis(2) color(orange) `xlabel' ///
+				twoway `lineordot' `outcome' `newtime' if `ids' == `x', yaxis(1) ylabel(`levsoutcome', valuelabel axis(1)) color("`y1color'") `xlabel' lw(`linewide') `options' ///
+				|| `lineordot' `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
 				||, xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
 				local graphs "`graphs' graph_`x'"
 			}
