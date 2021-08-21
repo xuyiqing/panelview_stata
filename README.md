@@ -26,23 +26,23 @@ The general syntax of the package can be summarized as:
 
 ```
 panelView Y D X [if] [in], 			///
-	I(varname) T(varname numeric)	///
-	TYPE(string)									///
-	[															///
-	discreteoutcome								///
-	bytiming											///
-	MYCOLor(string)								///
-	PREpost(string) 							///
-	continuoustreat								///
-	xlabdist(integer 1)						/// 
-	ylabdist(integer 1)						///
-	ignoretreat										///
-	bygroup												///
-	style(string)									///
-	byunit												///
-	theme(string)									///
-	lwd(string)										///
-	*															///
+	I(varname) T(varname numeric)		///
+	TYPE(string)				///
+	[					///
+	discreteoutcome				///
+	bytiming					///
+	MYCOLor(string)				///
+	PREpost(string) 				///
+	continuoustreat				///
+	xlabdist(integer 1)			/// 
+	ylabdist(integer 1)			///
+	ignoretreat				///
+	bygroup					///
+	style(string)				///
+	byunit					///
+	theme(string)				///
+	lwd(string)				///
+	*					///
 	]
 ```
 
