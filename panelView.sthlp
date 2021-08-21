@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1 18aug2021}{...}
+{* *! version 0.1 21aug2021}{...}
 {cmd:help panelView}
 {hline}
 
@@ -14,7 +14,7 @@
 {p 8 18 2}
 {cmdab:panelView} {it:{help varname:Y D}} {it:{help varlist:X}}
 {ifin} 
-{cmd:,} {opt I(varname)} {opt T(varname numeric)} {opt type(string)}
+{cmd:,} {opt I(varname)} {opt T(varname numeric)} {opt TYPE(string)}
 [{it:options}]
 
 {synoptset 23 tabbed}{...}
@@ -25,7 +25,7 @@
 {synopt:{opt Y D X}}{it:{help varlist}} of outcome variable, treatment variable, and covariates. Including covariates may change the plot because of missing values in these covariates{p_end}
 {synopt:{opt i(varname)}}Specify the unit (group) indicator{p_end}
 {synopt:{opt t(varname numeric)}}Specify the time indicator{p_end}
-{synopt:{opt type(string)}}Use {cmd:type(treat)} to plot treatments, {cmd:type(outcome)} to plot outcomes, or {cmd:type(bivar)} to plot outcome and treatment against
+{synopt:{opt type(string)}}Use {cmd:type(treat)} to plot treatments, {cmd:type(outcome)} to plot outcomes, and {cmd:type(bivar)} or {cmd:type(bivariate)} to plot outcome and treatment against
 time in the same graph{p_end}
 
 {syntab:Advanced}
@@ -37,12 +37,11 @@ time in the same graph{p_end}
 {synopt:{opt continuoustreat}}Plot the continuous treatment variable. If it is combined with {cmd: type(outcome)}, the figure would be the same as ignoring treatment{p_end}
 {synopt:{opt xlabdist(integer)}}Change gaps between labels on the x-axis.{cmd: ylabdist} Change gaps between labels on the y-axis. Default is {cmd: 1}{p_end}
 {synopt:{opt ignoretreat}}Omit the treatment indicator{p_end}
-{synopt:{opt bytreatgroup}}Put each unit into different treatment groups, then plot respectively{p_end}
-{synopt:{opt style(line)}}To visualize the zero level with discrete treatment, use line plot instead of bar plot when plot D and Y against time in the same graph{p_end}
-{synopt:{opt byunit}}Plot D and Y against time by each unit in the same graph{p_end}
+{synopt:{opt bygroup}}Put each unit into different treatment groups, then plot respectively{p_end}
+{synopt:{opt style()}}To visualize connected line ({cmd:connected} or {cmd:c}), line ({cmd:line} or {cmd:l}), or bar ({cmd:bar} or {cmd:b}) plot rather than the default. The first element defines the outcome style, and the second defines the treatment style{p_end}
+{synopt:{opt byunit}}Plot D and Y against time by each unit in the same graph in {cmd:type(bivar)}{p_end}
 {synopt:{opt theme(bw)}}Use the black and white theme (default when specified {cmd:type(bivar)}){p_end}
-{synopt:{opt linewidth()}}Set the line width in {cmd:type(bivar)}. Default is {cmd:medium}{p_end}
-{synopt:{opt connectedline}}Apply connected scatter plot in {cmd:type(bivar)}){p_end}
+{synopt:{opt lwd()}}Set the line width in {cmd:type(bivar)}. Default is {cmd:medium}{p_end}
 {synopt:{opt *}}
 
 {synoptline}
@@ -90,7 +89,7 @@ We develop this package in the belief that it is always a good idea to understan
 {p 4 8 2}{stata "panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) prepost(off) xlabdist(3) ylabdist(10)":. panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) prepost(off) xlabdist(3) ylabdist(10)}  {p_end}
 
 {p 6 6 2}For a panel dataset in which the treatment may switch on and off, we do not differentiate between pre- and post-treatment statuses. Use the {cmd:xlabdist} and {cmd:ylabdist} option to change the gaps between labels on the x- and y-axes. {p_end}
- 
+
 
 {pstd}Ignoring Treatment Conditions{p_end}
 
@@ -125,9 +124,9 @@ We develop this package in the belief that it is always a good idea to understan
 
 {p 6 6 2}We paint the period right before when the treatment begin as treated period. Different with {cmd:type(treat)}, {cmd:type(outcome)} does not need {cmd:xlabdist} and {cmd:ylabdist}. If needed, we should use  {cmd:xlabel} and {cmd:ylabel}. {p_end}
 
-{p 4 8 2}{stata "panelView turnout policy_edr , i(abb) t(year) type(outcome) bytreatgroup xlabel(1920 (20) 2000) ":. panelView turnout policy_edr, i(abb) t(year) type(outcome) bytreatgroup xlabel(1920 (20) 2000)}{p_end}
+{p 4 8 2}{stata "panelView turnout policy_edr , i(abb) t(year) type(outcome) bygroup xlabel(1920 (20) 2000) ":. panelView turnout policy_edr, i(abb) t(year) type(outcome) bygroup xlabel(1920 (20) 2000)}{p_end}
 
-{p 6 6 2}Option {cmd:bytreatgroup} will analyze the data and automatically put each unit into different groups, e.g. (1) Always treated, (2) always in control, (3) treatment status changed. {p_end}
+{p 6 6 2}Option {cmd:bygroup} will analyze the data and automatically put each unit into different groups, e.g. (1) Always treated, (2) always in control, (3) treatment status changed. {p_end}
 
 {pstd}Discrete Outcomes{p_end}
 {p 4 8 2}{stata "sysuse simdata":. sysuse simdata}{p_end}
@@ -147,10 +146,10 @@ We develop this package in the belief that it is always a good idea to understan
 
 {pstd}Plot average time series for all units{p_end}
 {p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
-{p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivar) connectedline msize(*0.5)":. panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivar) connectedline msize(*0.5)}{p_end}
+{p 4 8 2}{stata "panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)":. panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)}{p_end}
 
-{p 6 6 2}Visualize time series of the mean outcome and treatment in one figure by {cmd:type(bivar)}. For continuous treatment, we use line plot; for discrete treatment, we use bar plot. {p_end} 
-{p 6 6 2}No matter the outcome is continuous or discrete, line plot is applied. The left y axis indicates outcome label, and the right y axis indicates treatment label. {p_end}
+{p 6 6 2}Visualize time series of the mean outcome and treatment in one figure by {cmd:type(bivar)}. {cmd:style(c b)} means that, for continuous treatment, we use connected line plot; for discrete treatment, we use bar plot. {p_end} 
+{p 6 6 2}The left y axis indicates outcome label, and the right y axis indicates treatment label. {p_end}
 
 {pstd}Plot by each unit{p_end}
 {p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
@@ -168,6 +167,7 @@ We develop this package in the belief that it is always a good idea to understan
 
       Yiqing Xu, yiqingxu@stanford.edu
       Stanford
-	  
+      
       Hongyu Mou, muhongyu@pku.edu.cn
       PKU
+	  

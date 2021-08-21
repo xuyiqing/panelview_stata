@@ -1,6 +1,6 @@
 /*
 Version 0.1
-Aug 17 2021
+Aug 21 2021
 Hongyu Mou
 */
 
@@ -122,7 +122,7 @@ panelView turnout policy_edr policy_mail_in policy_motor if abb == 1|abb == 2|ab
 
 *Put each unit into different groups, then plot respectively, e.g. (1) always treated, (2) always in control, (3) treatment status changed.
 use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bytreatgroup xlabel(1920 (20) 2000)
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup xlabel(1920 (20) 2000)
 
 
 
@@ -144,7 +144,7 @@ panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteout
 
 *Put each unit into different groups, then plot respectively:
 use simdata.dta, replace
-panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bytreatgroup 
+panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup 
 
 
 
@@ -185,36 +185,36 @@ panelView Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") pre
 
 
 /***** 11. Plot mean D and Y against time in the same graph *****/
-/***** 1. Y: continuous; D: dummy *****/
+/***** 1. Y: continuous; D: discrete *****/
 use turnout.dta, clear
 *label the first and second y axes
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) type(bivar) ylabel(0 (20) 100) ylabel(0 (0.1) 0.5, axis(2)) connectedline msize(*0.5)
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)
 
 use capacity.dta, clear 
-panelView lnpop demo, i(country) t(year) xlabdist(10) type(bivar) mycolor(Reds) linewidth(medthick)
+panelView lnpop demo, i(country) t(year) xlabdist(10) type(bivar) mycolor(Reds) lwd(medthick)
 
-/***** 2. Y: Discrete; D: dummy *****/
+/***** 2. Y: discrete; D: discrete *****/
 use simdata.dta, replace
-panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) type(bivar)
+panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) type(bivar) mycolor(Reds)
 
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
 panelView lnpop polity2, i(country) t(year) continuoustreat prepost(off) xlabdist(20) type(bivar)
 
-/***** 4. Y: Discrete; D: continuous *****/
+/***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelView Y x, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar)
+panelView Y x, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar) style(b c)
 
 
 /***** Line the discete treatment *****/
-* Y: continuous; D: dummy 
+* Y: continuous; D: discrete 
 use turnout.dta, clear
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) style(line) type(bivar)
 
-*Y: Discrete; D: dummy
+*Y: Discrete; D: discrete
 use simdata.dta, replace
-panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) style(line) type(bivar) connectedline
+panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) style(line) type(bivar)
 
 
 
@@ -222,23 +222,23 @@ panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) style(line) type(bivar) 
 
 /***** 12. Plot D and Y against time in the same graph by each unit *****/
 
-/***** 1. Y: continuous; D: dummy *****/
+/***** 1. Y: continuous; D: discrete *****/
 use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) type(bivar) byunit 
+panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) type(bivar) byunit
 
 use capacity.dta, clear 
 panelView lnpop demo if country >= 1 & country <= 24, i(country) t(year) xlabdist(20) type(bivar) byunit
 
-/***** 2. Y: Discrete; D: dummy *****/
+/***** 2. Y: discrete; D: discrete *****/
 use simdata.dta, replace
-panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) type(bivar) byunit
+panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) type(bivar) byunit 
 
 
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
 panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat prepost(off) xlabdist(20) type(bivar) byunit
 
-/***** 4. Y: Discrete; D: continuous *****/
+/***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
 panelView Y x if id >= 101 & id <= 112, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar) byunit
@@ -246,12 +246,12 @@ panelView Y x if id >= 101 & id <= 112, i(id) t(time) prepost(off) continuoustre
 
 
 /***** Line the discete treatment *****/
-* Y: continuous; D: dummy 
+* Y: continuous; D: discrete 
 use turnout.dta, clear
 panelView turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(line) type(bivar) byunit
 
-*Y: Discrete; D: dummy
+*Y: Discrete; D: discrete
 use simdata.dta, replace
-panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) style(line) type(bivar) byunit connectedline
+panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) style(l) type(bivar) byunit
 
  

@@ -1,7 +1,7 @@
 v 0.1
 d 'panelView': `panelView` Visualizing Panel Data
 d 
-d Distribution-Date:   20210818
+d Distribution-Date:   20210821
 d License: MIT
 d 
 f panelView.ado
