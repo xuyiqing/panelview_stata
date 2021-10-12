@@ -343,7 +343,7 @@ program define panelView
 	}
 	
 	//deciding color
-	colorpalette Reds , n(`numlevsplot') nograph
+	colorpalette Blues , n(`numlevsplot') nograph
 
 	if (`"`mycolor'"' != "") {
 		colorpalette `mycolor' , n(`numlevsplot') nograph
@@ -540,7 +540,7 @@ program define panelView
 			gen `add' = 0 - `r(min)'
 			replace `plotvalue' = `plotvalue' + `add'
 			qui levelsof `plotvalue' if `touse', loc(levsplot_color)
-			colorpalette Reds , n(`numlevsplot') nograph
+			colorpalette Blues , n(`numlevsplot') nograph
 			if (`"`mycolor'"' != "") {
 				colorpalette `mycolor' , n(`numlevsplot') nograph
 			}
@@ -576,7 +576,7 @@ program define panelView
 			gen `add' = 0 - `r(min)'
 			replace `plotvalue' = `plotvalue' + `add'
 			qui levelsof `plotvalue' if `touse', loc(levsplot_color)
-			colorpalette Reds , n(`numlevsplot') nograph
+			colorpalette Blues , n(`numlevsplot') nograph
 			if (`"`mycolor'"' != "") {
 				colorpalette `mycolor' , n(`numlevsplot') nograph
 			}

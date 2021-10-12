@@ -1,12 +1,12 @@
 # `PanelView` in STATA: Visualizing Panel Data
 
-The **`panelView`** package has two main functionalities: (1) it visualizes the treatment and missing-value statuses of each observation in a panel/time-series-cross-sectional (TSCS) dataset; and (2) it plots the outcome variable (either continuous or discrete) in a time-series fashion.
+The **`panelView`** package has two main functionalities: (1) it visualizes the treatment and missing-value statuses of each observation in a panel/time-series-cross-sectional (TSCS) dataset; and (2) it plots the variables of interest (either continuous or discrete) in a time-series fashion.
 
 We develop this package in the belief that it is always a good idea to understand your raw data better before conducting statistical analyses.
 
 ------
 
-**Date:** August 21, 2021
+**Date:** October 12, 2021
 
 **Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata)) 
 
@@ -26,23 +26,23 @@ The general syntax of the package can be summarized as:
 
 ```
 panelView Y D X [if] [in], 			///
-	I(varname) T(varname numeric)		///
-	TYPE(string)				///
-	[					///
-	discreteoutcome				///
-	bytiming					///
-	MYCOLor(string)				///
-	PREpost(string) 				///
-	continuoustreat				///
-	xlabdist(integer 1)			/// 
-	ylabdist(integer 1)			///
-	ignoretreat				///
-	bygroup					///
-	style(string)				///
-	byunit					///
-	theme(string)				///
-	lwd(string)				///
-	*					///
+	I(varname) T(varname numeric)	///
+	TYPE(string)									///
+	[															///
+	discreteoutcome								///
+	bytiming											///
+	MYCOLor(string)								///
+	PREpost(string) 							///
+	continuoustreat								///
+	xlabdist(integer 1)						/// 
+	ylabdist(integer 1)						///
+	ignoretreat										///
+	bygroup												///
+	style(string)									///
+	byunit												///
+	theme(string)									///
+	lwd(string)										///
+	*															///
 	]
 ```
 
@@ -50,16 +50,16 @@ where the subcommand can be:
 
 | Subcommand                | Description                                                  |
 | :------------------------ | ------------------------------------------------------------ |
-| `Y D X`                   | `varlist` of outcome variable, treatment variable, and covariates. Including covariates may change the plot because of missing values in these covariates. |
+| `Y D X`                   | `varlist` of outcome variable, treatment variable, and covariates. Including covariates may change the plot because of missing values in covariates. |
 | `if` and `in`             | If any variable not included in the `varlist` or `i()` / `t()` appears in the `if`/ `in` subcommand, we should add this variable into the  `varlist` following `panelView` command. |
 | `I()` and `T()`           | Specify the unit (group) and time indicators.                |
 | `TYPE()`                  | Use `type(treat)` to plot treatments, `type(outcome)` to plot outcomes, and `type(bivar)` or `type(bivariate)`  to plot outcome and treatment against time in the same graph. |
 | `discreteoutcome`         | Plot the discrete outcome variable.                          |
 | `bytiming`                | Sort units by the timing of receiving the treatment (then by the total number of periods exposed to the treatment). |
-| `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). Default theme is  `Reds`. |
+| `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). Default theme is  `Blues`. |
 | `PREpost(off)`            | Not distinguish the pre- and post-treatment periods for treated units. |
 | `continuoustreat`         | Plot the continuous treatment variable. If it is combined with `type(outcome)`, the figure would be the same as ignoring treatment. |
-| `xlabdist` and `ylabdist` | Change integer gaps between labels on the x- and y-axes. Default is 1. |
+| `xlabdist()` and `ylabdist()` | Change integer gaps between labels on the x- and y-axes. Default is 1. |
 | `ignoretreat`             | Omit the treatment indicator.                                |
 | `bygroup`            | Put each unit into different treatment groups, then plot respectively. |
 | `style()`        | To visualize connected line ( `connected`  or  `c` ), line ( `line`  or  `l` ), or bar ( `bar`  or  `b` ) plot rather than the default. The first element defines the outcome style, and the second defines the treatment style. |
@@ -299,7 +299,7 @@ use capacity.dta, clear
 gen demo2 = 0
 replace demo2 = -1 if polity2 < -0.5
 replace demo2 = 1 if polity2 > 0.5
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Blues) // type(treat) & number of treatment level = 3
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Reds) // type(treat) & number of treatment level = 3
 ```
 
 <img src="./graph/Graph16.png">
@@ -312,7 +312,7 @@ gen demo2 = 0
 replace demo2 = -2 if polity2 < -0.7
 replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Blues) // number of treatment level = 4
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Reds) // number of treatment level = 4
 ```
 
 <img src="./graph/Graph18.png">
