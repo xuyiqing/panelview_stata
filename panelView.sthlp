@@ -32,7 +32,7 @@ time in the same graph{p_end}
 {synopt:{opt [if] [in]}}If any variable not included in the {cmd:varlist} or {cmd: i()} / {cmd: t()} appears in the {cmd:if}/ {cmd:in} subcommand, we should add this variable into the {cmd:varlist} following {cmd:panelView} command{p_end}
 {synopt:{opt discreteoutcome}}Plot the discrete outcome variable{p_end}
 {synopt:{opt bytiming}}Sort units by the timing of receiving the treatment (then by the total number of periods exposed to the treatment){p_end}
-{synopt:{opt mycol:or(string)}}Change the color schemes; click {it:{help colorpalette:here}} for sequential colors (3-9 colors). Default is {cmd:Reds}{p_end} 
+{synopt:{opt mycol:or(string)}}Change the color schemes; click {it:{help colorpalette:here}} for sequential colors (3-9 colors). Default is {cmd:Blues}{p_end} 
 {synopt:{opt pre:post(off)}}Not distinguish the pre- and post-treatment periods for treated units{p_end}
 {synopt:{opt continuoustreat}}Plot the continuous treatment variable. If it is combined with {cmd: type(outcome)}, the figure would be the same as ignoring treatment{p_end}
 {synopt:{opt xlabdist(integer)}}Change gaps between labels on the x-axis.{cmd: ylabdist} Change gaps between labels on the y-axis. Default is {cmd: 1}{p_end}
@@ -170,4 +170,3 @@ We develop this package in the belief that it is always a good idea to understan
       
       Hongyu Mou, muhongyu@pku.edu.cn
       PKU
-	  
