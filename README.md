@@ -6,7 +6,7 @@ We develop this package in the belief that it is always a good idea to understan
 
 ------
 
-**Date:** October 12, 2021
+**Date:** October 26, 2021
 
 **Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata)) 
 
@@ -14,9 +14,28 @@ Please report bugs to yiqingxu@stanford.edu or muhongyu@pku.edu.cn!
 
 ------
 
-__Table of Contents__  
+__Table of Contents__
 
 [TOC]
+
+------
+
+## 0. Installation
+
+As a pre-requisite, the `github` package needs to be installed:
+
+```
+net install github, from("https://haghish.github.io/github/")
+```
+
+Then install the `panelView` package with Stata v15 or greater: 
+
+```
+cap ado uninstall fect //in-case already installed
+github install xuyiqing/panelview_stata
+```
+
+For the `sysuse` command to access example datasets of `panelView`, users should download the datasets (`capacity.dta`, `simdata.dta`, `turnout.dta`) and place them in the directories searched by Stata from `adopath`, as Stata's download commmands would not do that automatically.
 
 ------
 
@@ -25,24 +44,24 @@ __Table of Contents__
 The general syntax of the package can be summarized as:
 
 ```
-panelView Y D X [if] [in], 			///
-	I(varname) T(varname numeric)	///
-	TYPE(string)									///
-	[															///
-	discreteoutcome								///
-	bytiming											///
-	MYCOLor(string)								///
-	PREpost(string) 							///
-	continuoustreat								///
-	xlabdist(integer 1)						/// 
-	ylabdist(integer 1)						///
-	ignoretreat										///
-	bygroup												///
-	style(string)									///
-	byunit												///
-	theme(string)									///
-	lwd(string)										///
-	*															///
+panelView Y D X [if] [in], 			       ///
+	I(varname) T(varname numeric)	       ///
+	TYPE(string)						   ///
+	[									   ///
+	discreteoutcome						   ///
+	bytiming							   ///
+	MYCOLor(string)						   ///
+	PREpost(string) 					   ///
+	continuoustreat						   ///
+	xlabdist(integer 1)					   /// 
+	ylabdist(integer 1)					   ///
+	ignoretreat							   ///
+	bygroup								   ///
+	style(string)						   ///
+	byunit								   ///
+	theme(string)						   ///
+	lwd(string)							   ///
+	*									   ///
 	]
 ```
 
