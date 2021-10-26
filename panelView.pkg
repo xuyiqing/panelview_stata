@@ -6,3 +6,6 @@ d License: MIT
 d 
 f panelView.ado
 f panelView.sthlp
+f simdata.dta
+f capacity.dta
+f turnout.dta
