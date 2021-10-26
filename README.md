@@ -31,7 +31,7 @@ net install github, from("https://haghish.github.io/github/")
 Then install the `panelView` package with Stata v15 or greater: 
 
 ```
-cap ado uninstall fect //in-case already installed
+cap ado uninstall panelView //in-case already installed
 github install xuyiqing/panelview_stata
 ```
 
@@ -46,22 +46,22 @@ The general syntax of the package can be summarized as:
 ```
 panelView Y D X [if] [in], 			       ///
 	I(varname) T(varname numeric)	       ///
-	TYPE(string)						   ///
-	[									   ///
-	discreteoutcome						   ///
-	bytiming							   ///
-	MYCOLor(string)						   ///
-	PREpost(string) 					   ///
-	continuoustreat						   ///
-	xlabdist(integer 1)					   /// 
-	ylabdist(integer 1)					   ///
-	ignoretreat							   ///
-	bygroup								   ///
-	style(string)						   ///
-	byunit								   ///
-	theme(string)						   ///
-	lwd(string)							   ///
-	*									   ///
+	TYPE(string)						   					 ///
+	[									   						     ///
+	discreteoutcome						   				 ///
+	bytiming							 							 ///
+	MYCOLor(string)						   				 ///
+	PREpost(string) 					   				 ///
+	continuoustreat						  				 ///
+	xlabdist(integer 1)					   			 /// 
+	ylabdist(integer 1)					   			 ///
+	ignoretreat							   					 ///
+	bygroup								   						 ///
+	style(string)						   					 ///
+	byunit								   						 ///
+	theme(string)						   					 ///
+	lwd(string)							   					 ///
+	*									   								 ///
 	]
 ```
 
