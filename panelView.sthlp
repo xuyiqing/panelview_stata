@@ -143,7 +143,7 @@ We develop this package in the belief that it is always a good idea to understan
 {pstd}Plotting Y and D against time in the same graph{p_end}
 
 {pstd}Plot average time series for all units{p_end}
-{p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)":. panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)}{p_end}
+{p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) msize(*0.5) style(c b)":. panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) msize(*0.5) style(c b)}{p_end}
 
 {p 6 6 2}Visualize time series of the mean outcome and treatment in one figure by {cmd:type(bivar)}. {cmd:style(c b)} means that, for continuous treatment, we use connected line plot; for discrete treatment, we use bar plot. {p_end} 
 {p 6 6 2}The left y axis indicates outcome label, and the right y axis indicates treatment label. {p_end}
