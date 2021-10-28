@@ -63,7 +63,7 @@ We develop this package in the belief that it is always a good idea to understan
 {title:Examples}
 
 {pstd}Load example data (the {cmd:turnout} dataset){p_end}
-{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
+{p 4 8 2}{stata "sysuse turnout, clear":. sysuse turnout, clear}{p_end}
 
 {pstd}Basic syntax{p_end}
 {p 4 8 2}{stata "panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) prepost(off)":. panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) prepost(off)}{p_end}
@@ -85,7 +85,7 @@ We develop this package in the belief that it is always a good idea to understan
 {pstd}Treatment: missing & switch on and off{p_end}
 
 {pstd}Load example data (the {cmd:capacity} dataset){p_end}
-{p 4 8 2}{stata "sysuse capacity":. sysuse capacity}{p_end}
+{p 4 8 2}{stata "sysuse capacity, clear":. sysuse capacity, clear}{p_end}
 {p 4 8 2}{stata "panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) prepost(off) xlabdist(3) ylabdist(10)":. panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) prepost(off) xlabdist(3) ylabdist(10)}  {p_end}
 
 {p 6 6 2}For a panel dataset in which the treatment may switch on and off, we do not differentiate between pre- and post-treatment statuses. Use the {cmd:xlabdist} and {cmd:ylabdist} option to change the gaps between labels on the x- and y-axes. {p_end}
@@ -94,7 +94,6 @@ We develop this package in the belief that it is always a good idea to understan
 {pstd}Ignoring Treatment Conditions{p_end}
 
 {pstd}Load example data (the {cmd:capacity} dataset){p_end}
-{p 4 8 2}{stata "sysuse capacity":. sysuse capacity}{p_end}
 {p 4 8 2}{stata "panelView demo, i(ccode) t(year) type(treat) mycolor(Reds) xlabel(none) ylabel(none) ignoretreat":. panelView demo, i(ccode) t(year) type(treat) mycolor(Reds) xlabel(none) ylabel(none) ignoretreat}{p_end}
 
 {p 6 6 2}Omit the treatment variable, in which case, the plot will show missing (the white area) and non-missing values only. {p_end}
@@ -106,7 +105,6 @@ We develop this package in the belief that it is always a good idea to understan
 
 {pstd}{cmd:panelView} supports TSCS data with more than 2 treatment levels. For example, we create a measure of regime type with three treatment levels: {p_end}
 {pstd}Load example data (the {cmd:capacity} dataset){p_end}
-{p 4 8 2}{stata "sysuse capacity":. sysuse capacity}{p_end}
 {p 4 8 2}{stata "gen demo2 = 0":. gen demo2 = 0}{p_end}
 {p 4 8 2}{stata "replace demo2 = -1 if polity2 < -0.5":. replace demo2 = -1 if polity2 < -0.5}{p_end}
 {p 4 8 2}{stata "replace demo2 = 1 if polity2 > 0.5":. replace demo2 = 1 if polity2 > 0.5}{p_end}
@@ -119,7 +117,7 @@ We develop this package in the belief that it is always a good idea to understan
 {pstd}Plotting Outcomes{p_end}
 
 {pstd}Continuous Outcomes{p_end}
-{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
+{p 4 8 2}{stata "sysuse turnout, clear":. sysuse turnout, clear}{p_end}
 {p 4 8 2}{stata "panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) ylabel(0 (25) 100)":. panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) ylabel(0 (25) 100)}{p_end}
 
 {p 6 6 2}We paint the period right before when the treatment begin as treated period. Different with {cmd:type(treat)}, {cmd:type(outcome)} does not need {cmd:xlabdist} and {cmd:ylabdist}. If needed, we should use  {cmd:xlabel} and {cmd:ylabel}. {p_end}
@@ -129,14 +127,14 @@ We develop this package in the belief that it is always a good idea to understan
 {p 6 6 2}Option {cmd:bygroup} will analyze the data and automatically put each unit into different groups, e.g. (1) Always treated, (2) always in control, (3) treatment status changed. {p_end}
 
 {pstd}Discrete Outcomes{p_end}
-{p 4 8 2}{stata "sysuse simdata":. sysuse simdata}{p_end}
+{p 4 8 2}{stata "sysuse simdata, clear":. sysuse simdata, clear}{p_end}
 {p 4 8 2}{stata "panelView Y D, type(outcome) i(id) t(time) discreteoutcome xlabel(8 (2) 15) ylabel(0 (1) 2)":. panelView Y D, type(outcome) i(id) t(time) discreteoutcome xlabel(8 (2) 15) ylabel(0 (1) 2)}{p_end}
 {p 6 6 2}Accommodate discrete variables by setting {cmd:discreteoutcome}. {p_end}
 
 
 {pstd}Plotting any variable in a panel dataset{p_end}
 
-{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
+{p 4 8 2}{stata "sysuse turnout, clear":. sysuse turnout, clear}{p_end}
 {p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) type(outcome) ylabel(0 (25) 100) ignoretreat":. panelView turnout policy_edr, i(abb) t(year) type(outcome) ylabel(0 (25) 100) ignoretreat}{p_end}
 
 {p 6 6 2}Plot an outcome variable (or any variable) in a panel dataset by {cmd:type(outcome)} and {cmd:ignoretreat}. {p_end}
@@ -145,28 +143,27 @@ We develop this package in the belief that it is always a good idea to understan
 {pstd}Plotting Y and D against time in the same graph{p_end}
 
 {pstd}Plot average time series for all units{p_end}
-{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
-{p 4 8 2}{stata "panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)":. panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)}{p_end}
+{p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)":. panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) msize(*0.5) style(c b)}{p_end}
 
 {p 6 6 2}Visualize time series of the mean outcome and treatment in one figure by {cmd:type(bivar)}. {cmd:style(c b)} means that, for continuous treatment, we use connected line plot; for discrete treatment, we use bar plot. {p_end} 
 {p 6 6 2}The left y axis indicates outcome label, and the right y axis indicates treatment label. {p_end}
 
 {pstd}Plot by each unit{p_end}
-{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
 {p 4 8 2}{stata "panelView turnout policy_edr if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) type(bivar) byunit":. panelView turnout policy_edr if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) type(bivar) byunit}{p_end}
 
 {p 6 6 2}Plot D and Y for each unit against time in the same graph. {p_end}
 
 {pstd}Line the discrete treatment{p_end}
-{p 4 8 2}{stata "sysuse turnout":. sysuse turnout}{p_end}
 {p 4 8 2}{stata "panelView turnout policy_edr if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(line) type(bivar) byunit":. panelView turnout policy_edr if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(line) type(bivar) byunit}{p_end}
 
 {p 6 6 2}To visualize the zero level with discrete treatment, we add {cmd:style(line)} to plot treatment lines instead of bars.{p_end} 
 
 {title:Authors}
 
+      Hongyu Mou, muhongyu@pku.edu.cn
+      PKU
+      
       Yiqing Xu, yiqingxu@stanford.edu
       Stanford
       
-      Hongyu Mou, muhongyu@pku.edu.cn
-      PKU
+      

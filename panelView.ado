@@ -1,7 +1,7 @@
 /*
 Version 0.1
-Aug 21 2021
-Yiqing Xu, Hongyu Mou
+Oct 27 2021
+Hongyu Mou, Yiqing Xu
 */
 
 capture program drop panelView
@@ -32,25 +32,25 @@ program define panelView
 	//check needed packages
 	cap which colorpalette.ado
 	if _rc {
-		di as error "colorpalette.ado required: {stata search colorpalette}"
+		di as error "colorpalette.ado required: {stata net install gr0075.pkg, replace}"
 		exit 199
 	}
 	
 	cap which labmask.ado
 	if _rc {
-		di as error "labmask.ado required: {stata search labutil}"
+		di as error "labmask.ado required: {stata ssc install labutil, replace}"
 		exit 199
 	}
 
 	cap which sencode.ado
 	if _rc {
-		di as error "labmask.ado required: {stata search sencode}"
+		di as error "sencode.ado required: {stata ssc install sencode, replace}"
 		exit 199
 	}
 
 	cap which grc1leg.ado
 	if _rc {
-		di as error "labmask.ado required: {stata search grc1leg}"
+		di as error "grc1leg.ado required: {stata net install grc1leg}"
 		exit 199
 	}
 	
@@ -198,8 +198,8 @@ program define panelView
 			
 			if (`numlevstreat' == 2) {
 			tempvar max_treat
-			bys `nids': egen `max_treat' = max(`treat') 
-			gen `gcontrol' = 1
+			cap bys `nids': egen `max_treat' = max(`treat') 
+			cap gen `gcontrol' = 1
 			qui replace `gcontrol' = 0 if `max_treat' >= 1
 			}
 			else {
@@ -241,12 +241,12 @@ program define panelView
 		tempvar bytime 
 		tempvar min_bytime
 		tempvar num_trtime
-		gen `bytime' = .
-		replace `bytime' = `tunit' if `treat' > = 1
-		bys `nids': egen `min_bytime' = min(`bytime')
-		bys `nids': egen `num_trtime' = count(`bytime')
+		cap gen `bytime' = .
+		cap replace `bytime' = `tunit' if `treat' > = 1
+		cap bys `nids': egen `min_bytime' = min(`bytime')
+		cap bys `nids': egen `num_trtime' = count(`bytime')
 		drop `bytime'
-		
+
 		tempvar nids2
 		tempvar nids3
 		decode `ids', generate(`nids2')
@@ -276,29 +276,29 @@ program define panelView
 	//paint the period right before treatment:
 	if "`ignoretreat'" == "" {
 	if ("`type'" == "outcome" & "`discreteoutcome'" == "" ) { 
-			destring `labeltime', replace
+			cap destring `labeltime', replace
 			tempvar L1_labeltime L1_time
-			bys `nids': gen `L1_labeltime' = `labeltime'[_n-1] if `treat' >= 1
-			bys `nids': egen `L1_time' = min(`L1_labeltime')
-			replace `treat' = 1 if `labeltime' == `L1_time'			
+			cap bys `nids': gen `L1_labeltime' = `labeltime'[_n-1] if `treat' >= 1
+			cap bys `nids': egen `L1_time' = min(`L1_labeltime')
+			cap replace `treat' = 1 if `labeltime' == `L1_time'			
 		}
 	}
 
 
 	tempvar plotvalue 
 	if ("`continuoustreat'" != "" & "`type'" == "outcome") {
-		gen `plotvalue' = 0
+		cap gen `plotvalue' = 0
 		}
 		else {
 			if "`ignoretreat'" != "" { 
-			gen `plotvalue' = 0
+			cap gen `plotvalue' = 0
 			}
 			else { 
 				if ("`type'" == "outcome" & `numlevstreat' > 2) {
-				gen `plotvalue' = 0
+				cap gen `plotvalue' = 0
 				}
 				else {	
-				gen `plotvalue' = `treat'
+				cap gen `plotvalue' = `treat'
 				//remapping continuous treatment to 5 levels to fit color palettes levels:
 				if "`continuoustreat'" != "" {
 					qui sum `plotvalue' 
@@ -333,7 +333,7 @@ program define panelView
 			if ("`type'" == "treat") {
 				tempvar altlevsplot
 				egen `altlevsplot' = group(`plotvalue') if `touse' 
-				replace `altlevsplot' =  `altlevsplot' - 1
+				cap replace `altlevsplot' =  `altlevsplot' - 1
 				qui levelsof `altlevsplot' if `touse', loc (levsplot)
 				loc numlevsplot = r(r)
 				drop `altlevsplot'
@@ -343,11 +343,10 @@ program define panelView
 	}
 	
 	//deciding color
-	colorpalette Blues , n(`numlevsplot') nograph
+	colorpalette "198 219 239" "107 174 214" "66 146 198" "31 120 180" "8 81 156", n(`numlevsplot') nograph
 
 	if (`"`mycolor'"' != "") {
 		colorpalette `mycolor' , n(`numlevsplot') nograph
-		
 	}
 
 	if "`theme'" == "bw" {
@@ -366,10 +365,10 @@ program define panelView
 	loc trpreortr `2'
 	tempvar nopre
 	if "`trpreortr'" != "" {
-		gen `nopre' = (`trpreortr' == 2) 
+		cap gen `nopre' = (`trpreortr' == 2) 
 	}
 	else {
-		gen `nopre' = 0
+		cap gen `nopre' = 0
 	}
 
 	if `nopre' != 1 {
@@ -479,8 +478,8 @@ program define panelView
 			//add some randomness to time units and outcome so that they can scatter around:
 			di "now display dots of discrete outcome"
 			tempvar rout rtime
-			gen `rtime' = `tunit' + runiform(-0.2, 0.2)
-			gen `rout' = `outcome' + runiform(-0.2, 0.2)
+			cap gen `rtime' = `tunit' + runiform(-0.2, 0.2)
+			cap gen `rout' = `outcome' + runiform(-0.2, 0.2)
 
 			
 			loc dot1
@@ -528,19 +527,19 @@ program define panelView
 		if `"`bytiming'"' != "" {
 		*2.1. With bytiming:		
 		tempvar y0 y1
-		gen `y1'=`nids3'+ 0.5 
+		cap gen `y1'=`nids3'+ 0.5 
 		qui sum `y1'
 		la val `y1' `:val lab `nids3''
-		gen `y0'=`nids3'- 0.5 
+		cap gen `y0'=`nids3'- 0.5 
 		
 		qui levelsof `plotvalue' if `touse', loc(levsplot)
 		qui sum `plotvalue' if `touse', mean
 		if (`r(min)' < 0) {
 			tempvar add 
-			gen `add' = 0 - `r(min)'
-			replace `plotvalue' = `plotvalue' + `add'
+			cap gen `add' = 0 - `r(min)'
+			cap replace `plotvalue' = `plotvalue' + `add'
 			qui levelsof `plotvalue' if `touse', loc(levsplot_color)
-			colorpalette Blues , n(`numlevsplot') nograph
+			colorpalette "198 219 239" "107 174 214" "66 146 198" "31 120 180" "8 81 156" , n(`numlevsplot') nograph
 			if (`"`mycolor'"' != "") {
 				colorpalette `mycolor' , n(`numlevsplot') nograph
 			}
@@ -564,19 +563,19 @@ program define panelView
 		else {
 		*2.2. Without bytiming:
 		tempvar y0 y1
-		gen `y1'=`nids'+ 0.5 
+		cap gen `y1'=`nids'+ 0.5 
 		qui sum `y1'
 		la val `y1' `:val lab `nidslab''
-		gen `y0'=`nids'- 0.5 
+		cap gen `y0'=`nids'- 0.5 
 		
 		qui levelsof `plotvalue' if `touse', loc(levsplot)
 		qui sum `plotvalue' if `touse', mean
 		if (`r(min)' < 0) {
 			tempvar add 
-			gen `add' = 0 - `r(min)'
-			replace `plotvalue' = `plotvalue' + `add'
+			cap gen `add' = 0 - `r(min)'
+			cap replace `plotvalue' = `plotvalue' + `add'
 			qui levelsof `plotvalue' if `touse', loc(levsplot_color)
-			colorpalette Blues , n(`numlevsplot') nograph
+			colorpalette "198 219 239" "107 174 214" "66 146 198" "31 120 180" "8 81 156" , n(`numlevsplot') nograph
 			if (`"`mycolor'"' != "") {
 				colorpalette `mycolor' , n(`numlevsplot') nograph
 			}
@@ -585,12 +584,14 @@ program define panelView
 			loc col`w' = r(p`uu') 
 			}
 			foreach w of loc levsplot_color{
-				loc gcom `"`gcom'||rbar `y1' `y0' `newtime' if (`plotvalue'==`w')&(`touse'), barw(`xdist') col("`col`w''") fi(inten100) lw(none) "' //100% intensity, full color. Line has zero width: it vanishes
+				loc gcom `"`gcom'||rbar `y1' `y0' `newtime' if (`plotvalue'==`w')&(`touse'), barw(`xdist') col("`col`w''") fi(inten100) lw(none) "' 
+				//100% intensity, full color. Line has zero width: it vanishes
 				}
 		}
 		else {
 			foreach w of loc levsplot{
-				loc gcom `"`gcom'||rbar `y1' `y0' `newtime' if (`plotvalue'==`w')&(`touse'), barw(`xdist') col("`col`w''") fi(inten100) lw(none) "' //100% intensity, full color. Line has zero width: it vanishes
+				loc gcom `"`gcom'||rbar `y1' `y0' `newtime' if (`plotvalue'==`w')&(`touse'), barw(`xdist') col("`col`w''") fi(inten100) lw(none) "' 
+				//100% intensity, full color. Line has zero width: it vanishes
 				}
 		}
 
@@ -647,7 +648,7 @@ program define panelView
 					} 
 				}
 			}
-		tw `gcom' plotr(fc(white) margin(zero)) ||`sc' `options'
+		tw `gcom' plotr(fc(white) margin(zero)) ||`sc'  `options'
 	}
 
 
