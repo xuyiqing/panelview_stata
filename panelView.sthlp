@@ -25,8 +25,7 @@
 {synopt:{opt Y D X}}{it:{help varlist}} of outcome variable, treatment variable, and covariates, respectively. Including covariates may change the look of the plot due to missing values in these covariates{p_end}
 {synopt:{opt i(varname)}}Specify the unit (group) indicator{p_end}
 {synopt:{opt t(varname numeric)}}Specify the time indicator{p_end}
-{synopt:{opt type(string)}}Use {cmd:type(treat)} to plot treatment assignment using a heatmap. Use {cmd:type(outcome)} to plot an outcome variable---or any variable---in a time series fashion. Use {cmd:type(bivar)} or {cmd:type(bivariate)} to plot the outcome and treatment variables against time in the same graph
-time in the same graph{p_end}
+{synopt:{opt type(string)}}Use {cmd:type(treat)} to plot treatment assignment using a heatmap. Use {cmd:type(outcome)} to plot an outcome variable---or any variable---in a time series fashion. Use {cmd:type(bivar)} or {cmd:type(bivariate)} to plot the outcome and treatment variables against time in the same graph{p_end}
 
 {syntab:Advanced}
 {synopt:{opt [if] [in]}}We recommend users to add variable that is not included in the {cmd:varlist} or {cmd: i()} / {cmd: t()} but appears in the {cmd:if}/ {cmd:in} subcommand to the {cmd:varlist} following {cmd:panelView} command{p_end}
