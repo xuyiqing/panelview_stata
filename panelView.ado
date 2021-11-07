@@ -4,9 +4,9 @@ Nov 07 2021
 Hongyu Mou, Yiqing Xu
 */
 
-capture program drop panelView
+capture program drop panelview
 
-program define panelView
+program define panelview
 	version 15.1
 	syntax varlist(min = 1 numeric) [if] [in] , ///
 	I(varname) T(varname numeric)	///
@@ -15,11 +15,11 @@ program define panelView
 	continuoustreat					///
 	discreteoutcome					///
 	bytiming						///
+	ignoretreat						///
 	MYCOLor(string)					///
 	PREpost							///
 	xlabdist(integer 1)				/// 
 	ylabdist(integer 1)				///
-	ignoretreat						///
 	bygroup							///
 	style(string)					///
 	byunit							///
@@ -57,20 +57,10 @@ program define panelView
 	
 
 	//check for bad option combinations:
-/* 
-	if "`continuoustreat'" != "" {
-		if ("`type'" == "treat") {
-		if  ("`prepost'" != "off") {
-		di as err "option ContinuousTreatment and prepost(off) should be combined" 
-		exit 198
-		}
-		}
-	}
-*/
 
 	if "`continuoustreat'" != "" {
 		if "`bytiming'" != "" { 
-			di as err "option Continuous Treatment and ByTiming may not be combined"
+			di as err "option continuoustreat and bytiming may not be combined"
 			exit 198
 		}
 	}
@@ -78,19 +68,18 @@ program define panelView
 	if "`continuoustreat'" != "" {
 		if "`ignoretreat'" != "" {
 			di as err ///
-			"option Continuous Treatment and Ignoretreat may not be combined"
+			"option continuoustreat and ignoretreat may not be combined"
 			exit 198
 		}
 	}
-/*
-	if "`ignoretreat'" != "" {
-		if "`prepost'" != "" { 
+
+	if "`continuoustreat'" != "" {
+		if ("`type'" == "miss" | "`type'" == "missing") {
 			di as err ///
-			"option Ignoretreat and prepost(off) may not be combined"
+			"option continuoustreat and type(missing) may not be combined"
 			exit 198
 		}
-	}
-*/	
+	}	
 
 	if ("`bygroup'" != "") { 
 		if ("`prepost'" == "") { 
@@ -103,7 +92,7 @@ program define panelView
 	if ("`type'" == "outcome") {
 		if ("`bytiming'" != "") {
 			di as err ///
-			"option Type(outcome) and Bytiming may not be combined"
+			"option type(outcome) and bytiming may not be combined"
 			exit 198
 		}
 	}
@@ -115,17 +104,18 @@ program define panelView
 
 	qui keep `varlist' `i' `t' //only keep using variables, i.e. include covariates
 	marksample touse 
-	drop if `touse' == 0 //To include covariates
+	cap drop if `touse' == 0 //To include covariates
 
 
 	qui ds `varlist'
 	tempvar numvar
 	gen `numvar' = `: word count `r(varlist)''
 
+
 	if `numvar' == 1 {
-		if ("`ignoretreat'" == "") {
-			di as err "should combine with option Ignoretreat when varlist has only one variable" 
-			exit 198
+		if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing") {
+				di as err "should combine with option type(missing) or ignoretreat when varlist has only one variable" 
+				exit 198
 		} 
 		else {
 			tokenize `varlist'
@@ -133,7 +123,7 @@ program define panelView
 		}
 	}
 	else if  `numvar' == 2 {
-		if "`ignoretreat'" != "" {
+		if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") {
 			tokenize `varlist'
 			loc outcome `1'
 			} 
@@ -144,7 +134,7 @@ program define panelView
 		}
 	} 
 	else { //`numvar' >= 3:
-		if "`ignoretreat'" != "" { 
+		if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") { 
 			tokenize `varlist'
 			loc outcome `1'
 		} 
@@ -192,7 +182,7 @@ program define panelView
 			gen `gcontrol' = 1 
 	}
 	else {
-    if ("`ignoretreat'" != "") { 
+    if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") { 
 			gen `gcontrol' = 1 
 			} 
 			else { 
@@ -277,7 +267,7 @@ program define panelView
 
 
 	//paint the period right before treatment:
-	if "`ignoretreat'" == "" {
+	if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing") {
 	if ("`type'" == "outcome" & "`discreteoutcome'" == "" ) { 
 			cap destring `labeltime', replace
 			tempvar L1_labeltime L1_time
@@ -293,7 +283,7 @@ program define panelView
 		cap gen `plotvalue' = 0
 		}
 		else {
-			if "`ignoretreat'" != "" { 
+			if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") { 
 			cap gen `plotvalue' = 0
 			}
 			else { 
@@ -313,13 +303,17 @@ program define panelView
 		} 
 		
 
-
-
+if ("`type'" == "miss" | "`type'" == "missing") { 
+	if ("`ignoretreat'" == "") {
+		tempvar ignoretreat
+		gen `ignoretreat' = 1	
+	}
+}
 
 	qui levelsof `plotvalue' if `touse', loc (levsplot) 
 	loc numlevsplot = r(r) 
 
-	if "`ignoretreat'" == "" { 
+	if ("`ignoretreat'" == "") { 
 	if ("`continuoustreat'" == "" | "`type'" != "outcome") {
 		if `numlevstreat' == 2 {
 		if "`prepost'" != "" {
@@ -495,7 +489,7 @@ program define panelView
 			tw `dot1' legend(region(lstyle(none) fcolor(none)) row(1) order(1) label(1 "Observed")) ytitle("`outcome'") xtitle("`tunit'") `options'
 			}
 			else { 
-					if "`ignoretreat'" != "" { // ignore treatment:
+					if ("`ignoretreat'" != "") { // ignore treatment:
 					tw `dot1' legend(region(lstyle(none) fcolor(none)) row(1) order(1) label(1 "Observed")) ytitle("`outcome'") xtitle("`tunit'") `options'
 					} 
 					else {
@@ -524,7 +518,7 @@ program define panelView
 	
 	
 	
-	else if ("`type'" == "treat"){
+	else if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing"){
 	// 2. Heatmap of treatment: type(treat):
 
 		if `"`bytiming'"' != "" {
@@ -601,7 +595,7 @@ program define panelView
 		loc sc `"sc `nids' `newtime' if `touse', mlabpos(0) msy(i)"' 
 		}
 
-			if "`ignoretreat'" != "" { // ignore treatment:
+			if ("`ignoretreat'" != "") { // ignore treatment:
 			local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1) label(1 "Observed") size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 			} 
 			else { 
