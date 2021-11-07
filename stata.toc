@@ -1,5 +1,5 @@
 v 0.1
-d Materials by Yiqing Xu, Hongyu Mou
+d Materials by Hongyu Mou, Yiqing Xu
 d yiqingxu@stanford.edu
 d https://github.com/xuyiqing/panelView_stata
 

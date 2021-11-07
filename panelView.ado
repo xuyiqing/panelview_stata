@@ -1,6 +1,6 @@
 /*
 Version 0.1
-Oct 27 2021
+Nov 07 2021
 Hongyu Mou, Yiqing Xu
 */
 
@@ -12,11 +12,11 @@ program define panelView
 	I(varname) T(varname numeric)	///
 	TYPE(string)					///
 	[								///
+	continuoustreat					///
 	discreteoutcome					///
 	bytiming						///
 	MYCOLor(string)					///
-	PREpost(string) 				///
-	continuoustreat					///
+	PREpost							///
 	xlabdist(integer 1)				/// 
 	ylabdist(integer 1)				///
 	ignoretreat						///
@@ -28,7 +28,8 @@ program define panelView
 	*								///
 	]
 	
-	
+
+
 	//check needed packages
 	cap which colorpalette.ado
 	if _rc {
@@ -55,16 +56,17 @@ program define panelView
 	}
 	
 
-	//check for bad option combinations: 
+	//check for bad option combinations:
+/* 
 	if "`continuoustreat'" != "" {
 		if ("`type'" == "treat") {
 		if  ("`prepost'" != "off") {
-		di as err "option ContinuousTreatment and PrePost(off) should be combined" 
+		di as err "option ContinuousTreatment and prepost(off) should be combined" 
 		exit 198
 		}
 		}
 	}
-
+*/
 
 	if "`continuoustreat'" != "" {
 		if "`bytiming'" != "" { 
@@ -80,19 +82,20 @@ program define panelView
 			exit 198
 		}
 	}
-
+/*
 	if "`ignoretreat'" != "" {
 		if "`prepost'" != "" { 
 			di as err ///
-			"option Ignoretreat and PrePost(off) may not be combined"
+			"option Ignoretreat and prepost(off) may not be combined"
 			exit 198
 		}
 	}
+*/	
 
 	if ("`bygroup'" != "") { 
-		if ("`prepost'" != "") { 
+		if ("`prepost'" == "") { 
 			di as err ///
-			"option bygroup and PrePost(off) may not be combined"
+			"option bygroup and prepost should be combined"
 			exit 198
 		}
 	}
@@ -152,8 +155,6 @@ program define panelView
 		}
 	}
 		
-	
-	
 
 
 	quietly count if `touse'
@@ -161,6 +162,8 @@ program define panelView
 		error 2000
 	}
 	
+
+
 	local ids `i'
 	local tunit `t'
 	
@@ -208,8 +211,8 @@ program define panelView
 					gen `gcontrol' = 1 
 				}
 				else { 
-					if  ("`prepost'" != "off") { 
-					di as err "with more than two treatment levels, option PrePost(off) should be combined" 
+					if  ("`prepost'" != "") { 
+					di as err "with more than two treatment levels, option prepost may not be combined" 
 					exit 198
 					}
 					else {
@@ -319,7 +322,7 @@ program define panelView
 	if "`ignoretreat'" == "" { 
 	if ("`continuoustreat'" == "" | "`type'" != "outcome") {
 		if `numlevstreat' == 2 {
-		if "`prepost'" != "off" {
+		if "`prepost'" != "" {
 		foreach x of loc levsplot {
 			qui replace `plotvalue' = `x' + 1 if `treat' == `x' & `treat' != 0
 		} 		
@@ -343,7 +346,7 @@ program define panelView
 	}
 	
 	//deciding color
-	colorpalette "198 219 239" "107 174 214" "66 146 198" "31 120 180" "8 81 156", n(`numlevsplot') nograph
+	colorpalette "198 219 239" "eltblue" "66 146 198" "31 120 180" "8 81 156", n(`numlevsplot') nograph
 
 	if (`"`mycolor'"' != "") {
 		colorpalette `mycolor' , n(`numlevsplot') nograph
@@ -431,11 +434,11 @@ program define panelView
 
 		foreach w of loc levsplot {
 			foreach x of loc levsnids {
-					if (`"`prepost'"' != "off" & `w' == 1 ) { 
+					if (`"`prepost'"' != "" & `w' == 1 ) { 
 					//with prepost: `w' == 1: treated(pre)
 						loc lines1 `" `lines1' || line `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse' , lcolor("`col`w''")"'
 					} 
-					else if (`"`prepost'"' == "off" & `w' == 0 ) { 
+					else if (`"`prepost'"' == "" & `w' == 0 ) { 
 					//without prepost: `w' == 0: treated(pre)
 						loc lines1 `" `lines1' || line `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse' , lcolor("`col`w''")"'
 					}
@@ -460,7 +463,7 @@ program define panelView
 						twoway `lines1' by(`bgplotvalue', legend(off) note("") cols(1)) yscale(noline) xscale(noline) `options'
 						}
 						else{ //without bygroup:
-						if (`"`prepost'"' != "off") {
+						if (`"`prepost'"' != "") {
 						tw `lines1' legend(off) yscale(noline) xscale(noline) `options'
 						}
 							else { //prepost=off:
@@ -500,11 +503,11 @@ program define panelView
 					tw `dot1' legend(region(lstyle(none) fcolor(none)) row(1) order(1) label(1 "Observed")) ytitle("`outcome'") xtitle("`tunit'") `options'
 					}
 					else { // not ignore treatment:
-					if ("`bygroup'" != "" ) { //with bygroup: cannot combined with prepost(off)
+					if ("`bygroup'" != "" ) { //with bygroup:
 					twoway `dot1' by(`bgplotvalue', cols(1) note("")) legend(region(lstyle(none) fcolor(none)) note("") row(1) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)")) yscale(noline) xscale(noline) ytitle("`outcome'") xtitle("`tunit'") `options'
 					} 
 					else{ //without bygroup:
-					if (`"`prepost'"' != "off") {
+					if (`"`prepost'"' != "") {
 					tw `dot1' legend(region(lstyle(none) fcolor(none)) row(1) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)")) yscale(noline) xscale(noline) ytitle("`outcome'") xtitle("`tunit'") `options'
 					}
 					else { //prepost=off:
@@ -606,7 +609,7 @@ program define panelView
 				local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2) label(1 "Control") label(2 "Treated") size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'	
 				}
 				else { // not ignore treatment:
-				if (`"`prepost'"' != "off") {
+				if (`"`prepost'"' != "") {
 					local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Control") label(2 "Treated(Pre)") label(3 "Treated(Post)") size(*0.6) symxsize(3) keygap(1)) xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1) xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 					}
 					

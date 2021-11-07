@@ -6,7 +6,7 @@ We develop this package in the belief that it is always a good idea to understan
 
 ------
 
-**Date:** October 27, 2021
+**Date:** November 07, 2021
 
 **Version:** 0.1 ([Github](https://github.com/xuyiqing/panelView_stata)) 
 
@@ -68,14 +68,14 @@ The general syntax of the package can be summarized as:
 
 ```
 panelView Y D X [if] [in], 			       ///
-	I(varname) T(varname numeric)	       ///
-	TYPE(string)						   					 ///
+	i(varname) t(varname numeric)	       ///
+	type(string)						   					 ///
 	[									   						     ///
+	continuoustreat						  				 ///
 	discreteoutcome						   				 ///
 	bytiming							 							 ///
 	MYCOLor(string)						   				 ///
-	PREpost(string) 					   				 ///
-	continuoustreat						  				 ///
+	PREpost					 					   				 ///
 	xlabdist(integer 1)					   			 /// 
 	ylabdist(integer 1)					   			 ///
 	ignoretreat							   					 ///
@@ -92,21 +92,21 @@ where the subcommand can be:
 
 | Subcommand                | Description                                                  |
 | :------------------------ | ------------------------------------------------------------ |
-| `Y D X`                   | `varlist` of outcome variable, treatment variable, and covariates. Including covariates may change the plot because of missing values in covariates. |
-| `if` and `in`             | If any variable not included in the `varlist` or `i()` / `t()` appears in the `if`/ `in` subcommand, we should add this variable into the  `varlist` following `panelView` command. |
-| `I()` and `T()`           | Specify the unit (group) and time indicators.                |
-| `TYPE()`                  | Use `type(treat)` to plot treatments, `type(outcome)` to plot outcomes, and `type(bivar)` or `type(bivariate)`  to plot outcome and treatment against time in the same graph. |
-| `discreteoutcome`         | Plot the discrete outcome variable.                          |
-| `bytiming`                | Sort units by the timing of receiving the treatment (then by the total number of periods exposed to the treatment). |
-| `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). Default theme is  `Blues`. |
-| `PREpost(off)`            | Not distinguish the pre- and post-treatment periods for treated units. |
-| `continuoustreat`         | Plot the continuous treatment variable. If it is combined with `type(outcome)`, the figure would be the same as ignoring treatment. |
+| `Y D X`                   | `varlist` of outcome variable, treatment variable, and covariates, respectively. Including covariates may change the look of the plot due to missing values in these covariates. |
+| `if` and `in`             | We recommend users to add variable that is not included in the `varlist` or `i()` / `t()` but appears in the `if`/ `in` subcommand to the  `varlist` following `panelView` command. |
+| `i()` and `t()`        | Specify the unit (group) and time indicators.                |
+| `type()`               | Use `type(treat)` to plot treatment assignment using a heatmap. Use `type(outcome)` to plot an outcome variable---or any variable---in a time series fashion. Use `type(bivar)` or `type(bivariate)` to plot the outcome and treatment variables against time in the same graph. |
+| `continuoustreat` | The treatment variable is presented as a continuous variable in a `type(outcome)` plot |
+| `discreteoutcome`         | When a variable is discrete, make sure `panelView` respects its discreteness in `type(outcome)` plots. |
+| `bytiming`                | Sort units by the timing of first receiving the treatment; if the timing is the same, then by the total number of periods exposed to the treatment. |
+| `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). |
+| `PREpost`            | Distinguish the pre- and post-treatment periods for treated units. |
 | `xlabdist()` and `ylabdist()` | Change integer gaps between labels on the x- and y-axes. Default is 1. |
-| `ignoretreat`             | Omit the treatment indicator.                                |
-| `bygroup`            | Put each unit into different treatment groups, then plot respectively. |
-| `style()`        | To visualize connected line ( `connected`  or  `c` ), line ( `line`  or  `l` ), or bar ( `bar`  or  `b` ) plot rather than the default. The first element defines the outcome style, and the second defines the treatment style. |
-| `byunit`                  | Plot D and Y against time by each unit in the same graph in `type(bivar)`. |
-| `theme(bw)`               | Use the black and white theme (default in `type(bivar)`). |
+| `ignoretreat`             | Omit the treatment indicator, that is, any variables after `Y` will be interpreted as covariates. |
+| `bygroup`            | Put each unit into different treatment groups, then plot them separately when `type(outcome)` is invoked. |
+| `style()`        | Determine the style of the elements in a plot.  The first and second entries define the style of the outcome and treatment, respectively. `connected` or `c` for connected lines, `line` or `l` for lines, `bar` or `b` for bars. |
+| `byunit`                  | Plot the outcome and treatment variables against time by each unit when `type(bivar)` is invoked. |
+| `theme(bw)`               | Use the black and white theme (default when specified `type(bivar)`). |
 | `lwd()`             | Set the line width in `type(bivar)`  (default is `medium`).  |
 
 ------
@@ -117,29 +117,31 @@ First, we show how to visualize the dichotomous treatment conditions in a panel 
 
 ### 2.1 Two treatment conditions
 
-Using the `turnout` dataset (a balanced panel), we show the treatment status of Election Day Registration (EDR) in each state in a given year ([Xu 2017](http://dx.doi.org/10.1017/pan.2016.2)). We can use the `title` option to change the title of the plot and change the titles of x- and y-axes through `xtitle` and `ytitle`, respectively. For DID-type TSCS data with a dichotomous treatment indicator, we can stop distinguish the pre- and post-treatment periods for treated units by specifying `prepost(off)`.
+Using the `turnout` dataset (a balanced panel), we show the treatment status of Election Day Registration (EDR) in each state in a given year ([Xu 2017](http://dx.doi.org/10.1017/pan.2016.2)). We can use the `title` option to change the title of the plot and change the titles of x- and y-axes through `xtitle` and `ytitle`, respectively. For DID-type panel data with a dichotomous treatment indicator, we can distinguish the pre- and post-treatment periods for treated units by specifying `prepost`.
+
+In the plot below,` turnout` is the outcome, `policy_edr` is the treatment, `policy_mail_in` and `policy_motor` are covariates.
 
 ```
 use turnout.dta, clear 
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")  prepost(off) 
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")
 ```
 
 <img src="./graph/Graph1.png">
 
-We can use the `bytiming` option to sort units by the timing of receiving the treatment and change the labels in the legend: 
+We can use the `bytiming` option to sort units by the timing of first receiving the treatment and use `legend` to change labels in the legend: 
 
 ```
 *bytiming
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")  prepost(off) bytiming legend(label(1 "No EDR") label(2 "EDR"))
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") bytiming legend(label(1 "No EDR") label(2 "EDR"))
 ```
 
 <img src="./graph/Graph2.png">
 
-Distinguish the pre- and post-treatment periods for treated units by not specifying `prepost(off)`: 
+Distinguish the pre- and post-treatment periods for treated units by specifying `prepost`: 
 
 ```
-*prepost != off
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") 
+*prepost
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") prepost
 ```
 
 <img src="./graph/Graph3.png">
@@ -148,7 +150,7 @@ Again, sort units by the timing of receiving the treatment:
 
 ```
 *bytiming
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") bytiming
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") prepost bytiming
 ```
 
 <img src="./graph/Graph4.png">
@@ -156,7 +158,7 @@ panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(tr
 Remove the labels on the y-axis by specifying `ylabel("")` or `ylabel(none)`: 
 
 ```
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) title("EDR Reform") prepost(off) ylabel("")
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) title("EDR Reform") ylabel("")
 ```
 
 <img src="./graph/Graph5.png">
@@ -165,18 +167,18 @@ Change the color schemes for the controls and treated using the `mycolor` option
 
 ```
 *mycolor(PuBu)
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") prepost(off) mycolor(PuBu) bytiming 
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") mycolor(PuBu) bytiming 
 ```
 
 <img src="./graph/Graph6.png">
 
 ### 2.2 Treatment: missing & switch on and off
 
-For a panel dataset in which the treatment may switch on and off, we do not differentiate between pre- and post-treatment statuses. To demonstrate how `panelView` can be used in a more general setting, the following plot uses the `capacity` dataset, which is used to investigate the effect of democracy, the treatment, on state capacity, the outcome ([Wang and Xu 2018](http://journals.sagepub.com/doi/full/10.1177/2053168018772398)). From the figure below, we see quite a few cases of democratic reversals and that there are many missing values (the white area). We use the `xlabdist` and   `ylabdist` option to change the gaps between labels on the x- and y-axes: 
+For a panel dataset in which the treatment may switch on and off, we no longer differentiate between pre- and post-treatment statuses. To demonstrate how `panelView` can be used in a more general setting, the following plot uses the `capacity` dataset, which is used to investigate the effect of democracy, the treatment, on state capacity, the outcome ([Wang and Xu 2018](http://journals.sagepub.com/doi/full/10.1177/2053168018772398)). `demo` is a binary indicator of regime type. From the figure below, we see quite a few cases of democratic reversals and that there are many missing values (the white area). We use the `xlabdist` and   `ylabdist` option to change the gaps between labels on the x- and y-axes: 
 
 ```
 use capacity.dta, clear
-panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10)
+panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) title("Democracy and State Capacity") xlabdist(3) ylabdist(10)
 ```
 
 <img src="./graph/Graph7.png">
@@ -185,7 +187,7 @@ Sorting units based on the first period a unit receives the treatment gives a mo
 
 ```
 *bytiming
-panelView lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) bytiming
+panelView lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) bytiming
 ```
 
 <img src="./graph/Graph8.png">
@@ -193,7 +195,7 @@ panelView lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) prepost
 Instead of indicate `country` as units, we use `i(ccode)` to indicate country code as units, which will change the label and sequence in our figure:
 
 ```
-panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) //If we set ylabdist(11), the "155" appears at the bottom of ylabel and is hard to remove, different with R package
+panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) //If we set ylabdist(11), the "155" appears at the bottom of ylabel and is hard to remove, different with R package
 ```
 
 <img src="./graph/Graph9.png">
@@ -202,19 +204,19 @@ Sort units based on the first period a unit receives the treatment and use `ylab
 
 ```
 *bytiming
-panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity: Treatement Status", size(medsmall)) bytiming xlabdist(3) ylabel(none) 
+panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity: Treatement Status", size(medsmall)) bytiming xlabdist(3) ylabel(none) 
 ```
 
 <img src="./graph/Graph10.png">
 
 ### 2.3 Plotting a subset of units
 
-Sometimes a dataset has many units and we only want to take a peak of a subset of the units. **panelView** allows users to specify the units to be shown by the `if` subcommand. Note that if any variable not included in the `varlist` or `i()` / `t()` following `panelView` appears in the `if` or `in` command, we should add such variable into the  `varlist` following `panelView`. In the following figure, we plot the treatment statuses of the first 25 units:
+Sometimes a dataset has many units and we only want to take a peak of a subset of the units. **panelView** allows users to specify the units to be shown by the `if` subcommand. Note that if any variable not included in the `varlist` or `i()` / `t()` following `panelView` appears in the `if` or `in` command, we recommend researchers to add such variable into the  `varlist` following `panelView`. In the following figure, we plot the treatment statuses of the first 25 units:
 
 ```
 use capacity.dta, clear
 egen ccodeid = group(ccode)
-panelView lnpop demo lngdp ccodeid if ccodeid >= 1 & ccodeid <= 26, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3)
+panelView lnpop demo lngdp ccodeid if ccodeid >= 1 & ccodeid <= 26, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3)
 ```
 
 <img src="./graph/Graph11.png">
@@ -223,7 +225,7 @@ Sort units based on the first period a unit receives the treatment:
 
 ```
 *bytiming
-panelView lnpop demo lngdp ccodeid if ccodeid >= 26 & ccodeid <= 51, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3) bytiming
+panelView lnpop demo lngdp ccodeid if ccodeid >= 26 & ccodeid <= 51, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3) bytiming
 ```
 
 <img src="./graph/Graph12.png">
@@ -269,7 +271,7 @@ panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Regime Typ
 
 ### 3.4 Plotting outcome & Continuous treatment / More than two treatment levels
 
-If the treatment indicator has more than 2 treatment levels or is a continuous variable, then treatment status will not be shown on the `type(outcome)` plot. In other words, `Type(outcome)` combined with `continuoustreat` or > 2 treatment levels is the same as  `ignoretreat`.
+If the treatment indicator has more than 2 treatment levels or is a continuous variable, then treatment status will not be shown on the `type(outcome)` plot. In other words, `type(outcome)` combined with `continuoustreat` or > 2 treatment levels is the same as  `ignoretreat`.
 
 #### 3.4.1 Continuous outcomes
 
@@ -298,7 +300,7 @@ gen demo2 = 0
 replace demo2 = -1 if polity2 < -0.5
 replace demo2 = 1 if polity2 > 0.5
 tab demo2, m 
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring Stata Capacity") prepost(off) legend(off) // number of treatment level = 3
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring Stata Capacity") legend(off) // number of treatment level = 3
 
 ```
 
@@ -310,7 +312,7 @@ When the number of treatment levels is more than two, the treatment status will 
 use simdata.dta, replace
 replace D = 2 if time < 5
 tab D, m
-panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title("Raw Data") prepost(off) // number of treatment level = 3
+panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title("Raw Data") // number of treatment level = 3
 ```
 
 <img src="./graph/Graph35.png">
@@ -325,7 +327,7 @@ panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title
 ```
 use simdata.dta, replace
 range x 0 1
-panelView Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") prepost(off) continuoustreat theme(bw) // continuous treatment & black and white theme
+panelView Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") continuoustreat theme(bw) // continuous treatment & black and white theme
 ```
 
 ------
@@ -334,14 +336,14 @@ panelView Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") pre
 
 ### 4.1 Treatment level = 3
 
-**panelView** supports TSCS data with more than 2 treatment levels. For example, we create a measure of regime type with three treatment levels: 
+**panelView** supports panel data with more than 2 treatment levels. For example, we create a measure of regime type with three treatment levels: 
 
 ```
 use capacity.dta, clear
 gen demo2 = 0
 replace demo2 = -1 if polity2 < -0.5
 replace demo2 = 1 if polity2 > 0.5
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Reds) // type(treat) & number of treatment level = 3
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) mycolor(Reds) // type(treat) & number of treatment level = 3
 ```
 
 <img src="./graph/Graph16.png">
@@ -354,7 +356,7 @@ gen demo2 = 0
 replace demo2 = -2 if polity2 < -0.7
 replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Reds) // number of treatment level = 4
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) mycolor(Reds) // number of treatment level = 4
 ```
 
 <img src="./graph/Graph18.png">
@@ -371,18 +373,18 @@ replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5 & polity2 < 0.7
 replace demo2 = 2 if polity2 > 0.7
 tab demo2, m 
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) continuoustreat
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) continuoustreat
 ```
 
 <img src="./graph/Graph19.png">
 
 ### 4.4 Continuous treatment
 
-Plot the continuous treatment variable by `continuoustreat`. Note that `continuoustreat` need to combine with `prepost(off)`.
+Plot the continuous treatment variable by `continuoustreat`. 
 
 ```
 use capacity.dta, clear
-panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) prepost(off) title("Regime Type") xlabdist(3) ylabdist(11) 
+panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
 ```
 
 <img src="./graph/Graph20.png">
@@ -392,7 +394,7 @@ If we change the level of the continuous treatment variable, the legend will mod
 ```
 use capacity.dta, clear
 replace polity2 = polity2 + 1
-panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) prepost(off) title("Regime Type") xlabdist(3) ylabdist(11) 
+panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
 ```
 
 <img src="./graph/Graph21.png">
@@ -415,11 +417,11 @@ panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(ou
 
 <img src="./graph/Graph22.png">
 
-Not distinguish the pre- and post-treatment periods for treated units: 
+Distinguish the pre- and post-treatment periods for treated units: 
 
 ```
-*prepost(off)
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") prepost(off) 
+*prepost
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") prepost
 ```
 
 <img src="./graph/Graph23.png">
@@ -439,18 +441,18 @@ We can specify which unit(s) we want to take a look at:
 
 ```
 use turnout.dta, clear 
-panelView turnout policy_edr policy_mail_in policy_motor if abb == 1|abb == 2|abb == 6, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout (AL, AR, CT)") mycolor(PuBu) 
+panelView turnout policy_edr policy_mail_in policy_motor if abb == 1|abb == 2|abb == 6, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout (AL, AR, CT)") mycolor(PuBu) prepost
 ```
 
 <img src="./graph/Graph25.png">
 
 ### 5.3 Put each unit into different groups, then plot respectively
 
-To better understand the data, sometimes we want to plot the outcome based on whether the treatment status has changed during the observed time period. We can simply add an option `bygroup`. The algorithm will analyze the data and automatically put each unit into different groups, e.g. (1) Always treated, (2) always in control, (3) treatment status changed.
+To better understand the data, sometimes we want to plot the outcome based on whether the treatment status has changed during the observed time period. We can simply add options `prepost` and `bygroup`. The algorithm will analyze the data and automatically put each unit into different groups, e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed.
 
 ```
 use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup xlabel(1920 (20) 2000) 
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup prepost xlabel(1920 (20) 2000) 
 ```
 
 <img src="./graph/Graph26.png">
@@ -476,7 +478,7 @@ We split the sample based on changes in treatment status:
 
 ```
 use simdata.dta, replace
-panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup 
+panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup prepost
 ```
 
 <img src="./graph/Graph30.png">
@@ -534,12 +536,12 @@ panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) type(bivar) mycolor(Reds
 
 <img src="./graph/Graph46.png">
 
-When treatment variable is continuous, we need to add the subcommands of `continuoustreat` and `prepost(off)`: 
+When treatment variable is continuous, we need to add the subcommands of `continuoustreat`: 
 
 ```
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelView lnpop polity2, i(country) t(year) continuoustreat prepost(off) xlabdist(20) type(bivar)
+panelView lnpop polity2, i(country) t(year) continuoustreat xlabdist(20) type(bivar)
 ```
 
 <img src="./graph/Graph47.png">
@@ -550,7 +552,7 @@ In the last situation, we plot discrete outcome and continuous treatment with op
 /***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelView Y x, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar) style(b c)
+panelView Y x, i(id) t(time) continuoustreat discreteoutcome xlabdist(4) type(bivar) style(b c)
 ```
 
 <img src="./graph/Graph48.png">
@@ -610,7 +612,7 @@ With continuous outcome and treatment:
 ```
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat prepost(off) xlabdist(20) type(bivar) byunit
+panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat xlabdist(20) type(bivar) byunit
 ```
 
 <img src="./graph/Graph40.png">
@@ -621,12 +623,12 @@ With discrete outcome and continuous treatment:
 /***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelView Y x if id >= 101 & id <= 112, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar) byunit
+panelView Y x if id >= 101 & id <= 112, i(id) t(time) continuoustreat discreteoutcome xlabdist(4) type(bivar) byunit
 ```
 
 <img src="./graph/Graph41.png">
 
-To visualize the zero level with discrete treatment, add `style(line)`: 
+To better visualize a discrete treatment whose value is sometimes zero, add `style(line)` to invoke line plots instead of bar plots: 
 
 ```
 /***** Line the discete treatment *****/

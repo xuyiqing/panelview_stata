@@ -1,6 +1,6 @@
 /*
 Version 0.1
-Aug 21 2021
+Nov 07 2021
 Hongyu Mou
 */
 
@@ -8,20 +8,20 @@ clear
 
 /***** 1. D: dummy; type(treat) *****/
 use turnout.dta, clear 
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")  prepost(off)
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")
 
 *bytiming
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")  prepost(off) bytiming legend(label(1 "No EDR") label(2 "EDR"))
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") bytiming legend(label(1 "No EDR") label(2 "EDR"))
 
-*prepost != off
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")  
+*prepost
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") prepost
 *bytiming
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") bytiming
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") prepost bytiming
 
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) title("EDR Reform") prepost(off) ylabel("")
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) title("EDR Reform") ylabel("")
 
 *mycolor(PuBu)
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") prepost(off) mycolor(PuBu) bytiming 
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") mycolor(PuBu) bytiming 
 
 
 
@@ -29,27 +29,27 @@ panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(tr
 /***** 2. Treatment may: missing & switch on and off; type(treat) *****/
 use capacity.dta, clear
 label list country
-panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) 
+panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) 
 
 *bytiming
-panelView lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) bytiming
+panelView lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) bytiming
 
 use capacity.dta, clear
-panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3) ylabdist(10)
+panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3) ylabdist(10)
 *bytiming
-panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity: Treatement Status", size(medsmall)) bytiming xlabdist(3) ylabel(none) 
+panelView lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity: Treatement Status", size(medsmall)) bytiming xlabdist(3) ylabel(none) 
 
 
 
 /***** 3. Plotting a subset of units *****/
 use capacity.dta, clear
 egen ccodeid = group(ccode)
-panelView lnpop demo lngdp ccodeid if ccodeid >= 1 & ccodeid <= 26, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3)
+panelView lnpop demo lngdp ccodeid if ccodeid >= 1 & ccodeid <= 26, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3)
 
 *bytiming
 use capacity.dta, clear
 egen ccodeid = group(ccode)
-panelView lnpop demo lngdp ccodeid if ccodeid >= 26 & ccodeid <= 51, i(ccode) t(year) type(treat) mycolor(PuBu) prepost(off) title("Democracy and State Capacity") xlabdist(3) bytiming
+panelView lnpop demo lngdp ccodeid if ccodeid >= 26 & ccodeid <= 51, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3) bytiming
 
 
 
@@ -69,9 +69,9 @@ gen demo2 = 0
 replace demo2 = -1 if polity2 < -0.5
 replace demo2 = 1 if polity2 > 0.5
 tab demo2, m 
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Blues) // numlevstreat = 3
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) mycolor(Blues) // numlevstreat = 3
 
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Regime Type") prepost(off) // type(outcome) & numlevstreat = 3
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Regime Type") // type(outcome) & numlevstreat = 3
 
 
 use capacity.dta, clear
@@ -80,7 +80,7 @@ replace demo2 = -2 if polity2 < -0.7
 replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5
 tab demo2, m 
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) mycolor(Blues) // numlevstreat = 4
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) mycolor(Blues) // numlevstreat = 4
 
 use capacity.dta, clear
 gen demo2 = 0
@@ -89,19 +89,19 @@ replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5 & polity2 < 0.7
 replace demo2 = 2 if polity2 > 0.7
 tab demo2, m 
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) prepost(off) continuoustreat // numlevstreat >= 5
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) continuoustreat // numlevstreat >= 5
 
 
 
 /***** 6. Continuous treatment *****/
 use capacity.dta, clear
 tab polity2, m
-panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) prepost(off) title("Regime Type") xlabdist(3) ylabdist(11) 
+panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
 
 use capacity.dta, clear
 tab polity2, m
 replace polity2 = polity2 + 1
-panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) prepost(off) title("Regime Type") xlabdist(3) ylabdist(11) 
+panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
 
 
 /***** 7. Continuous Outcomes *****/
@@ -110,19 +110,19 @@ panelView lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Re
 * Continuous outcome: turnout: 0-100; Discrete Treatment: policy_edr: 0/1
 use turnout.dta, clear 
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") ylabel(0 (25) 100)
-*prepost(off)
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") prepost(off)
+*prepost
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") prepost
 
 use turnout.dta, clear
 panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout") mycolor(PuBu) 
 
 *specify which unit(s) we want to take a look at,ex: id = c("AL", "AR", "CT")):
 use turnout.dta, clear 
-panelView turnout policy_edr policy_mail_in policy_motor if abb == 1|abb == 2|abb == 6, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout (AL, AR, CT)") mycolor(PuBu) 
+panelView turnout policy_edr policy_mail_in policy_motor if abb == 1|abb == 2|abb == 6, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("EDR Reform and Turnout (AL, AR, CT)") mycolor(PuBu) prepost
 
 *Put each unit into different groups, then plot respectively, e.g. (1) always treated, (2) always in control, (3) treatment status changed.
 use turnout.dta, clear
-panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup xlabel(1920 (20) 2000)
+panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup prepost xlabel(1920 (20) 2000)
 
 
 
@@ -144,7 +144,7 @@ panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteout
 
 *Put each unit into different groups, then plot respectively:
 use simdata.dta, replace
-panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup 
+panelView Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup prepost
 
 
 
@@ -164,7 +164,7 @@ gen demo2 = 0
 replace demo2 = -1 if polity2 < -0.5
 replace demo2 = 1 if polity2 > 0.5
 tab demo2, m 
-panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring Stata Capacity") prepost(off) legend(off) // numlevstreat = 3
+panelView Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring Stata Capacity") legend(off) // numlevstreat = 3
 
 
 * Discrete outcome
@@ -174,11 +174,11 @@ panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title
 use simdata.dta, replace
 replace D = 2 if time < 5
 tab D, m
-panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title("Raw Data") prepost(off) // numlevstreat = 3
+panelView Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title("Raw Data") // numlevstreat = 3
 
 use simdata.dta, replace
 range x 0 1
-panelView Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") prepost(off) continuoustreat theme(bw) // continuoustreat
+panelView Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") continuoustreat theme(bw) // continuoustreat
 
 
 
@@ -199,12 +199,12 @@ panelView Y D,i(id) t(time) discreteoutcome xlabdist(4) type(bivar) mycolor(Reds
 
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelView lnpop polity2, i(country) t(year) continuoustreat prepost(off) xlabdist(20) type(bivar)
+panelView lnpop polity2, i(country) t(year) continuoustreat xlabdist(20) type(bivar)
 
 /***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelView Y x, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar) style(b c)
+panelView Y x, i(id) t(time) continuoustreat discreteoutcome xlabdist(4) type(bivar) style(b c)
 
 
 /***** Line the discete treatment *****/
@@ -236,12 +236,12 @@ panelView Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4)
 
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat prepost(off) xlabdist(20) type(bivar) byunit
+panelView lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat xlabdist(20) type(bivar) byunit
 
 /***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelView Y x if id >= 101 & id <= 112, i(id) t(time) prepost(off) continuoustreat discreteoutcome xlabdist(4) type(bivar) byunit
+panelView Y x if id >= 101 & id <= 112, i(id) t(time) continuoustreat discreteoutcome xlabdist(4) type(bivar) byunit
 
 
 
