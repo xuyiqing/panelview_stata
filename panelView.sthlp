@@ -25,7 +25,7 @@
 {synopt:{opt Y D X}}{it:{help varlist}} of outcome variable, treatment variable, and covariates, respectively. Including covariates may change the look of the plot due to missing values in these covariates{p_end}
 {synopt:{opt i(varname)}}Specify the unit (group) indicator{p_end}
 {synopt:{opt t(varname numeric)}}Specify the time indicator{p_end}
-{synopt:{opt type(string)}}{cmd:type(treat)} plots treatment assignment using a heatmap. {cmd:type(outcome)} plots an outcome variable--or any variable--in a time series fashion. {cmd:type(bivar)} or {cmd:type(bivariate)} plots the outcome and treatment variables against time in the same graph{p_end}
+{synopt:{opt type(string)}}{cmd:type(treat)} plots treatment assignment in a heatmap. {cmd:type(outcome)} plots an outcome or any variable, and {cmd:type(bivar)} or {cmd:type(bivariate)} plots the outcome and treatment in time series{p_end}
 
 {syntab:Advanced}
 {synopt:{opt [if] [in]}}We recommend users to add variable that is not included in the {cmd:varlist} or {cmd: i()} / {cmd: t()} but appears in the {cmd:if}/ {cmd:in} subcommand to the {cmd:varlist} following {cmd:panelView} command{p_end}
@@ -37,7 +37,7 @@
 {synopt:{opt xlabdist(integer)}}Change gaps between labels on the x-axis.{cmd: ylabdist} Change gaps between labels on the y-axis. Default is {cmd: 1}{p_end}
 {synopt:{opt ignoretreat}}Omit the treatment indicator, that is, any variables after {cmd: Y} will be interpreted as covariates{p_end}
 {synopt:{opt bygroup}}Put each unit into different treatment groups, then plot them separately when {cmd: type(outcome)} is invoked{p_end}
-{synopt:{opt style()}}Determine the style of the elements in a plot. The first and second entries define the style of the outcome and treatment, respectively. {cmd:connected} or {cmd:c} for connected lines, {cmd:line} or {cmd:l} for lines, and {cmd:bar} or {cmd:b} for bars{p_end}
+{synopt:{opt style()}}The first and second entries define the style of the outcome and treatment, respectively. {cmd:connected} or {cmd:c} for connected lines, {cmd:line} or {cmd:l} for lines, and {cmd:bar} or {cmd:b} for bars{p_end}
 {synopt:{opt byunit}}Plot the outcome and treatment variables against time by each unit when {cmd: type(bivar)} is invoked{p_end}
 {synopt:{opt theme(bw)}}Use the black and white theme (default when specified {cmd:type(bivar)}){p_end}
 {synopt:{opt lwd()}}Set the line width in {cmd:type(bivar)}. Default is {cmd:medium}{p_end}
@@ -67,7 +67,8 @@ We develop this package in the belief that it is always a good idea to understan
 {pstd}Basic syntax{p_end}
 {p 4 8 2}{stata "panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat)":. panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat)}{p_end}
 
-{p 6 6 2} In this plot, {cmd: turnout} is the outcome, {cmd: policy_edr} is the treatment, {cmd: policy_mail_in} and {cmd: policy_motor} are covariates. For DID-type panel data with a dichotomous treatment indicator, we can distinguish the pre- and post-treatment periods for treated units by specifying {cmd:prepost}: 
+{p 6 6 2} In this plot, {cmd: turnout} is the outcome, {cmd: policy_edr} is the treatment, {cmd: policy_mail_in} and {cmd: policy_motor} are covariates.{p_end}
+{p 6 6 2} For DID-type panel data with a dichotomous treatment indicator, we can distinguish the pre- and post-treatment periods for treated units by specifying {cmd:prepost}:
 {p_end}
 
 {p 4 8 2}{stata "panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) prepost":. panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) prepost}{p_end}
@@ -88,7 +89,7 @@ We develop this package in the belief that it is always a good idea to understan
 {p 4 8 2}{stata "sysuse capacity, clear":. sysuse capacity, clear}{p_end}
 {p 4 8 2}{stata "panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) xlabdist(3) ylabdist(10)":. panelView lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) xlabdist(3) ylabdist(10)}  {p_end}
 
-{p 6 6 2}{cmd: demo} is a binary indicator of regime type. Use the {cmd:xlabdist} and {cmd:ylabdist} option to change the gaps between labels on the x- and y-axes. {p_end}
+{p 6 6 2}{cmd: demo} is a binary indicator of regime type. Use the {cmd:xlabdist} and {cmd:ylabdist} options to change the gaps between labels on the x- and y-axes. {p_end}
 
 
 {pstd}Ignoring Treatment Conditions{p_end}
@@ -118,11 +119,13 @@ We develop this package in the belief that it is always a good idea to understan
 {p 4 8 2}{stata "sysuse turnout, clear":. sysuse turnout, clear}{p_end}
 {p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) type(outcome) prepost ylabel(0 (25) 100)":. panelView turnout policy_edr, i(abb) t(year) type(outcome) prepost ylabel(0 (25) 100)}{p_end}
 
-{p 6 6 2}The three different colors represent the pure control units, treated units in the pre-treatment periods, and treated units in the post-treatment period. Different from a treatment status plot, an outcome plot does not allow {cmd:xlabdist} and {cmd:ylabdist}. Instead, {cmd:xlabel} and {cmd:ylabel} can be used to adjust looks of axis labels. {p_end}
+{p 6 6 2}The three different colors represent the pure control units, treated units in the pre-treatment periods, and treated units in the post-treatment period. {p_end}
+{p 6 6 2}Different from a treatment status plot, an outcome plot does not allow {cmd:xlabdist} and {cmd:ylabdist}. Instead, {cmd:xlabel} and {cmd:ylabel} can be used to adjust looks of axis labels. {p_end}
 
 {p 4 8 2}{stata "panelView turnout policy_edr , i(abb) t(year) type(outcome) bygroup prepost xlabel(1920 (20) 2000) ":. panelView turnout policy_edr, i(abb) t(year) type(outcome) bygroup prepost xlabel(1920 (20) 2000)}{p_end}
 
-{p 6 6 2}By options {cmd:bygroup} and {cmd: prepost}, {cmd: panelView} will analyze the data and automatically put each unit into different groups, e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed. {p_end}
+{p 6 6 2}By options {cmd:bygroup} and {cmd: prepost}, {cmd: panelView} will analyze the data and automatically put each unit into different groups{p_end}
+{p 6 6 2} e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed. {p_end}
 
 {pstd}Discrete Outcomes{p_end}
 {p 4 8 2}{stata "sysuse simdata, clear":. sysuse simdata, clear}{p_end}
@@ -144,7 +147,8 @@ We develop this package in the belief that it is always a good idea to understan
 {pstd}Plot average time series for all units{p_end}
 {p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) msize(*0.5) style(c b)":. panelView turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) msize(*0.5) style(c b)}{p_end}
 
-{p 6 6 2}Visualize time series of the average outcome and average treatment status in the same figure by specifying {cmd:type(bivar)}, in which {cmd:style(c b)} means that, for the continuous outcome, we use a connected line plot; for the discrete treatment, we use a bar plot. {p_end} 
+{p 6 6 2}Visualize time series of the average outcome and average treatment status in the same figure by specifying {cmd:type(bivar)}. {p_end}
+{p 6 6 2}{cmd:style(c b)} means that, for the continuous outcome, we use a connected line plot; for the discrete treatment, we use a bar plot. {p_end}
 {p 6 6 2}The left y axis indicates outcome label; the right y axis indicates treatment label. {p_end}
 
 {pstd}Plot by each unit{p_end}
