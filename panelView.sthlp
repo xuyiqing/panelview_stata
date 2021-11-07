@@ -25,19 +25,19 @@
 {synopt:{opt Y D X}}{it:{help varlist}} of outcome variable, treatment variable, and covariates, respectively. Including covariates may change the look of the plot due to missing values in these covariates{p_end}
 {synopt:{opt i(varname)}}Specify the unit (group) indicator{p_end}
 {synopt:{opt t(varname numeric)}}Specify the time indicator{p_end}
-{synopt:{opt type(string)}}Use {cmd:type(treat)} to plot treatment assignment using a heatmap. Use {cmd:type(outcome)} to plot an outcome variable---or any variable---in a time series fashion. Use {cmd:type(bivar)} or {cmd:type(bivariate)} to plot the outcome and treatment variables against time in the same graph{p_end}
+{synopt:{opt type(string)}}{cmd:type(treat)} plots treatment assignment using a heatmap. {cmd:type(outcome)} plots an outcome variable--or any variable--in a time series fashion. {cmd:type(bivar)} or {cmd:type(bivariate)} plots the outcome and treatment variables against time in the same graph{p_end}
 
 {syntab:Advanced}
 {synopt:{opt [if] [in]}}We recommend users to add variable that is not included in the {cmd:varlist} or {cmd: i()} / {cmd: t()} but appears in the {cmd:if}/ {cmd:in} subcommand to the {cmd:varlist} following {cmd:panelView} command{p_end}
 {synopt:{opt continuoustreat}}The treatment variable is presented as a continuous variable in a {cmd: type(outcome)} plot{p_end}
-{synopt:{opt discreteoutcome}} When a variable is discrete, make sure {cmd: panelView} respects its discreteness in {cmd: type(outcome)} plots{p_end}
+{synopt:{opt discreteoutcome}}When a variable is discrete, make sure {cmd: panelView} respects its discreteness in {cmd: type(outcome)} plots{p_end}
 {synopt:{opt bytiming}}Sort units by the first receiving the treatment; if the timing is the same, then by the total number of periods exposed to the treatment{p_end}
 {synopt:{opt mycol:or(string)}}Change the color schemes; click {it:{help colorpalette:here}} for sequential colors (3-9 colors){p_end} 
 {synopt:{opt pre:post}}Distinguish the pre- and post-treatment periods for treated units{p_end}
 {synopt:{opt xlabdist(integer)}}Change gaps between labels on the x-axis.{cmd: ylabdist} Change gaps between labels on the y-axis. Default is {cmd: 1}{p_end}
 {synopt:{opt ignoretreat}}Omit the treatment indicator, that is, any variables after {cmd: Y} will be interpreted as covariates{p_end}
 {synopt:{opt bygroup}}Put each unit into different treatment groups, then plot them separately when {cmd: type(outcome)} is invoked{p_end}
-{synopt:{opt style()}}Determine the style of the elements in a plot.  The first and second entries define the style of the outcome and treatment, respectively. {cmd:connected} or {cmd:c} for connected lines, {cmd:line} or {cmd:l} for lines, {cmd:bar} or {cmd:b} for bars{p_end}
+{synopt:{opt style()}}Determine the style of the elements in a plot. The first and second entries define the style of the outcome and treatment, respectively. {cmd:connected} or {cmd:c} for connected lines, {cmd:line} or {cmd:l} for lines, and {cmd:bar} or {cmd:b} for bars{p_end}
 {synopt:{opt byunit}}Plot the outcome and treatment variables against time by each unit when {cmd: type(bivar)} is invoked{p_end}
 {synopt:{opt theme(bw)}}Use the black and white theme (default when specified {cmd:type(bivar)}){p_end}
 {synopt:{opt lwd()}}Set the line width in {cmd:type(bivar)}. Default is {cmd:medium}{p_end}
@@ -122,7 +122,7 @@ We develop this package in the belief that it is always a good idea to understan
 
 {p 4 8 2}{stata "panelView turnout policy_edr , i(abb) t(year) type(outcome) bygroup prepost xlabel(1920 (20) 2000) ":. panelView turnout policy_edr, i(abb) t(year) type(outcome) bygroup prepost xlabel(1920 (20) 2000)}{p_end}
 
-{p 6 6 2}By adding option {cmd:bygroup} and {cmd: prepost}, {cmd: panelView} will analyze the data and automatically put each unit into different groups, e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed. {p_end}
+{p 6 6 2}By options {cmd:bygroup} and {cmd: prepost}, {cmd: panelView} will analyze the data and automatically put each unit into different groups, e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed. {p_end}
 
 {pstd}Discrete Outcomes{p_end}
 {p 4 8 2}{stata "sysuse simdata, clear":. sysuse simdata, clear}{p_end}
