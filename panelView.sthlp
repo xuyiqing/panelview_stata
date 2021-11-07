@@ -117,7 +117,7 @@ We develop this package in the belief that it is always a good idea to understan
 
 {pstd}Continuous Outcomes{p_end}
 {p 4 8 2}{stata "sysuse turnout, clear":. sysuse turnout, clear}{p_end}
-{p 4 8 2}{stata "panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) prepost ylabel(0 (25) 100)":. panelView turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) prepost ylabel(0 (25) 100)}{p_end}
+{p 4 8 2}{stata "panelView turnout policy_edr, i(abb) t(year) type(outcome) prepost ylabel(0 (25) 100)":. panelView turnout policy_edr, i(abb) t(year) type(outcome) prepost ylabel(0 (25) 100)}{p_end}
 
 {p 6 6 2}The three different colors represent the pure control units, treated units in the pre-treatment periods, and treated units in the post-treatment period. Different from a treatment status plot, an outcome plot does not allow {cmd:xlabdist} and {cmd:ylabdist}. Instead, {cmd:xlabel} and {cmd:ylabel} can be used to adjust looks of axis labels. {p_end}
 
