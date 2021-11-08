@@ -148,7 +148,7 @@ e.g. (1) units always being treated, (2) units always under control, (3) units w
 {pstd}Plotting Y and D against time in the same graph{p_end}
 
 {pstd}Plot average time series for all units{p_end}
-{phang2}. {stata panelview turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) msize(*0.5) style(c b) ytitle("turnout") ytitle("policy_edr", axis(2)) ylabel(40 (10) 70) ylabel(0 (0.1) 0.5, axis(2)) legend(label(1 "turnout") label(2 "policy_edr"))}{p_end}
+{phang2}. {stata panelview turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) msize(*0.5) style(c b) ytitle("turnout") ytitle("policy_edr", axis(2)) legend(label(1 "turnout") label(2 "policy_edr"))}{p_end}
 
 {p 6 6 2}Visualize time series of the average outcome and average treatment status in the same figure by specifying {cmd:type(bivariate)}.
 {cmd:style(c b)} means that, for the continuous outcome, we use a connected line plot; for the discrete treatment, we use a bar plot. We can specify the symbol size by {cmd:msize()} for connected line.
