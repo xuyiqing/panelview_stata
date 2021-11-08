@@ -80,11 +80,11 @@ panelview Y D X [if] [in], 			      ///
 	continuoustreat						   				///
 	discreteoutcome						   				///
 	bytiming							   						///
+	ignoretreat							   				  ///
 	MYCOLor(string)						   				///
 	PREpost					 			   						///
 	xlabdist(integer 1)					   			/// 
 	ylabdist(integer 1)					  		  ///
-	ignoretreat							   				  ///
 	bygroup								   						///
 	style(string)						   					///
 	byunit								   						///
@@ -102,7 +102,7 @@ where the subcommand can be:
 | `if` and `in`             | We recommend users to add variable that is not included in the `varlist` or `i()` / `t()` but appears in the `if`/ `in` subcommand to the  `varlist` following `panelview` command. |
 | `i()` and `t()`        | Specify the unit (group) and time indicators.                |
 | `type()`               | Use `type(treat)` to plot treatment assignment using a heatmap. Use `type(outcome)` to plot an outcome variable---or any variable---in a time series fashion. Use `type(bivar)` or `type(bivariate)` to plot the outcome and treatment variables against time in the same graph. Use `type(miss)` or `type(missing)` to plot the missing data status of a variable. |
-| `continuoustreat` | The treatment variable is presented as a continuous variable in a `type(outcome)` plot |
+| `continuoustreat` | The treatment variable is presented as a continuous variable |
 | `discreteoutcome`         | When a variable is discrete, make sure `panelview` respects its discreteness in `type(outcome)` plots. |
 | `bytiming`                | Sort units by the timing of first receiving the treatment; if the timing is the same, then by the total number of periods exposed to the treatment. |
 | `ignoretreat` | Omit the treatment indicator, that is, any variables after `Y` will be interpreted as covariates. |
