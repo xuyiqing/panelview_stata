@@ -72,16 +72,16 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 {pstd}Basic syntax{p_end}
 {phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")}{p_end}
 
-{p 6 6 2} In this plot, {cmd: turnout} is the outcome, {cmd: policy_edr} is the treatment, {cmd: policy_mail_in} and {cmd: policy_motor} are covariates.{p_end}
+{p 6 6 2} In this plot, {cmd: turnout} is the outcome, {cmd: policy_edr} is the treatment, {cmd: policy_mail_in} and {cmd: policy_motor} are the covariates.{p_end}
 
-{p 6 6 2} For DID-type panel data with a dichotomous treatment indicator, we can distinguish the pre- and post-treatment periods for treated units by specifying {cmd:prepost}:
+{p 6 6 2} For panel data with a staggered adoption design, we can distinguish the pre- and post-treatment periods for treated units by specifying {cmd:prepost}:
 {p_end}
 {phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) prepost}{p_end}
 
 
 {phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) bytiming legend(label(1 "No EDR") label(2 "EDR"))}{p_end}
 
-{p 6 6 2}use the {cmd:bytiming} option to sort units by the timing of receiving the treatment and use {cmd:legend} to change labels in the legend. {p_end}
+{p 6 6 2}use {cmd:bytiming} to sort units by the timing of receiving the treatment and use {cmd:legend} to change labels in the legend. {p_end}
 
 
 {pstd}Change the color schemes for the controls and treated using the {cmd:mycolor} option. For example, {cmd:PuBu} indicates light purple to blue:{p_end}
@@ -128,8 +128,9 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 
 {phang2}. {stata panelview turnout policy_edr, i(abb) t(year) type(outcome) bygroup prepost xlabel(1920 (20) 2000)}{p_end}
 
-{p 6 6 2}Due to options {cmd:bygroup} and {cmd: prepost}, {cmd: panelview} will analyze the data and automatically put each unit into different groups,
-e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed. {p_end}
+{p 6 6 2}Because {cmd:bygroup}is invoked, {cmd: panelview} analyzes the data and automatically put each unit into different groups based on the changes of their treatment statuses,
+e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed.
+{cmd:prepost} distinguishes pre- and post-treatment periods in group (3).{p_end}
 
 {pstd}Discrete Outcomes{p_end}
 {phang2}. {stata sysuse simdata, clear}{p_end}
@@ -150,7 +151,7 @@ e.g. (1) units always being treated, (2) units always under control, (3) units w
 {pstd}Plot average time series for all units{p_end}
 {phang2}. {stata panelview turnout policy_edr, i(abb) t(year) xlabdist(7) type(bivariate) msize(*0.5) style(c b) ytitle("turnout") ytitle("policy_edr", axis(2)) legend(label(1 "turnout") label(2 "policy_edr"))}{p_end}
 
-{p 6 6 2}Visualize time series of the average outcome and average treatment status in the same figure by specifying {cmd:type(bivariate)}.
+{p 6 6 2}Visualize the average outcome and average treatment status against time simultaneously by specifying {cmd:type(bivariate)}.
 {cmd:style(c b)} means that, for the continuous outcome, we use a connected line plot; for the discrete treatment, we use a bar plot. We can specify the symbol size by {cmd:msize()} for connected line.
 The left y axis indicates outcome label; the right y axis indicates treatment label. {p_end}
 
@@ -163,9 +164,8 @@ The left y axis indicates outcome label; the right y axis indicates treatment la
 {phang2}. {stata panelview turnout policy_edr if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(line) type(bivar) byunit l1title("Y") r1title("D")}{p_end}
 
 {p 6 6 2}To better visualize a discrete treatment whose value is sometimes zero, we use {cmd:style(line)} to invoke line plots instead of bar plots.
-Instead of {cmd:ytitle}, {cmd:l1title} and {cmd:r1title} can label the left and right axes, respectively. {p_end}
+Instead of using {cmd:ytitle}, we use {cmd:l1title} and {cmd:r1title} to label the left and right axes, respectively. {p_end}
 
-{pstd}For more examples, click {browse "https://github.com/xuyiqing/panelview_stata"}.{p_end}
 
 {title:Authors}
 
@@ -181,3 +181,5 @@ Instead of {cmd:ytitle}, {cmd:l1title} and {cmd:r1title} can label the left and 
 {title:Citation}
 
       Mou, Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive. 
+
+      For more examples, click {browse "https://github.com/xuyiqing/panelview_stata"}.

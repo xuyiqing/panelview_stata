@@ -739,39 +739,48 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 			if ("`style'" == "l b"|"`style'" == "line bar"|"`style'" == "line b"|"`style'" == "l bar") {
 				twoway line `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
-					|| bar `treat' `newtime', yaxis(2) color("`y2color'%50") xtitle("") `options'
+					|| bar `treat' `newtime', yaxis(2) color("`y2color'%50") xtitle("") `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 			else if ("`style'" == "l l"|"`style'" == "line line"|"`style'" == "line l"|"`style'" == "l line") {
 				twoway line `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
-					|| line `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
+					|| line `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 			else if ("`style'" == "b l"|"`style'" == "bar line"|"`style'" == "bar l"|"`style'" == "b line") {
 				twoway bar `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'%20") `options' ///
-					|| line `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
+					|| line `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 			else if ("`style'" == "b b"|"`style'" == "bar bar"|"`style'" == "bar b"|"`style'" == "b bar") {
 				twoway bar `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'%50") `options' ///
-				|| bar `treat' `newtime', yaxis(2) color("`y2color'%50") xtitle("") `options'
+				|| bar `treat' `newtime', yaxis(2) color("`y2color'%50") xtitle("") `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 			else if ("`style'" == "c b"|"`style'" == "connected bar"|"`style'" == "connected b"|"`style'" == "c bar") {
 				twoway connected `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
-					|| bar `treat' `newtime', yaxis(2) color("`y2color'%50") xtitle("") `options'
+					|| bar `treat' `newtime', yaxis(2) color("`y2color'%50") xtitle("") `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 			else if ("`style'" == "c c"|"`style'" == "connected connected"|"`style'" == "connected c"|"`style'" == "c connected") {
 				twoway connected `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
-					|| connected `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
+					|| connected `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 			else if ("`style'" == "b c"|"`style'" == "bar connected"|"`style'" == "bar c"|"`style'" == "b connected") {
 				twoway bar `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'%20") `options' ///
-					|| connected `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
+					|| connected `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 			else if ("`style'" == "l c"|"`style'" == "line connected"|"`style'" == "line c"|"`style'" == "l connected") {
 				twoway line `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
-					|| connected `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
+					|| connected `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 			else if ("`style'" == "c l"|"`style'" == "connected line"|"`style'" == "connected l"|"`style'" == "c line") {
 				twoway connected `outcome' `newtime', `xlabel' yaxis(1) color("`y1color'") lw(`linewide') `options' ///
-					|| line `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options'
+					|| line `treat' `newtime', yaxis(2) color("`y2color'") xtitle("") lw(`linewide') `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 			}
 		}
 
@@ -795,55 +804,64 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 				if ("`style'" == "l b"|"`style'" == "line bar"|"`style'" == "line b"|"`style'" == "l bar") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "l l"|"`style'" == "line line"|"`style'" == "line l"|"`style'" == "l line") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b l"|"`style'" == "bar line"|"`style'" == "bar l"|"`style'" == "b line") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%20") lw(none) `xlabel' ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b b"|"`style'" == "bar bar"|"`style'" == "bar b"|"`style'" == "b bar") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%50") lw(none) `xlabel' ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c b"|"`style'" == "connected bar"|"`style'" == "connected b"|"`style'" == "c bar") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c c"|"`style'" == "connected connected"|"`style'" == "connected c"|"`style'" == "c connected") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b c"|"`style'" == "bar connected"|"`style'" == "bar c"|"`style'" == "b connected") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%20") lw(none) `xlabel' ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "l c"|"`style'" == "line connected"|"`style'" == "line c"|"`style'" == "l connected") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c l"|"`style'" == "connected line"|"`style'" == "connected l"|"`style'" == "c line") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, ylabel(`levstreat', valuelabel axis(2)) ytitle("",axis(2)) xtitle("") title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 			}
@@ -857,55 +875,64 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 				if ("`style'" == "l b"|"`style'" == "line bar"|"`style'" == "line b"|"`style'" == "l bar") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "l l"|"`style'" == "line line"|"`style'" == "line l"|"`style'" == "l line") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b l"|"`style'" == "bar line"|"`style'" == "bar l"|"`style'" == "b line") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%20") lw(none) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b b"|"`style'" == "bar bar"|"`style'" == "bar b"|"`style'" == "b bar") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%50") lw(none) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c b"|"`style'" == "connected bar"|"`style'" == "connected b"|"`style'" == "c bar") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c c"|"`style'" == "connected connected"|"`style'" == "connected c"|"`style'" == "c connected") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b c"|"`style'" == "bar connected"|"`style'" == "bar c"|"`style'" == "b connected") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%20") lw(none) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "l c"|"`style'" == "line connected"|"`style'" == "line c"|"`style'" == "l connected") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c l"|"`style'" == "connected line"|"`style'" == "connected l"|"`style'" == "c line") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') ylabel(`levstreat', valuelabel axis(2)) `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 
@@ -918,55 +945,64 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 				if ("`style'" == "l b"|"`style'" == "line bar"|"`style'" == "line b"|"`style'" == "l bar") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "l l"|"`style'" == "line line"|"`style'" == "line l"|"`style'" == "l line") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b l"|"`style'" == "bar line"|"`style'" == "bar l"|"`style'" == "b line") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%20") lw(none) `xlabel' ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b b"|"`style'" == "bar bar"|"`style'" == "bar b"|"`style'" == "b bar") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%50") lw(none) `xlabel' ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c b"|"`style'" == "connected bar"|"`style'" == "connected b"|"`style'" == "c bar") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c c"|"`style'" == "connected connected"|"`style'" == "connected c"|"`style'" == "c connected") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b c"|"`style'" == "bar connected"|"`style'" == "bar c"|"`style'" == "b connected") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%20") lw(none) `xlabel' ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "l c"|"`style'" == "line connected"|"`style'" == "line c"|"`style'" == "l connected") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c l"|"`style'" == "connected line"|"`style'" == "connected l"|"`style'" == "c line") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 
@@ -985,55 +1021,64 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 				if ("`style'" == "l b"|"`style'" == "line bar"|"`style'" == "line b"|"`style'" == "l bar") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "l l"|"`style'" == "line line"|"`style'" == "line l"|"`style'" == "l line") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b l"|"`style'" == "bar line"|"`style'" == "bar l"|"`style'" == "b line") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%20") lw(none) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b b"|"`style'" == "bar bar"|"`style'" == "bar b"|"`style'" == "b bar") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%50") lw(none) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c b"|"`style'" == "connected bar"|"`style'" == "connected b"|"`style'" == "c bar") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| bar `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'%50") lw(none) `xlabel' `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c c"|"`style'" == "connected connected"|"`style'" == "connected c"|"`style'" == "c connected") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "b c"|"`style'" == "bar connected"|"`style'" == "bar c"|"`style'" == "b connected") {
 					twoway bar `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'%20") lw(none) `xlabel' ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "l c"|"`style'" == "line connected"|"`style'" == "line c"|"`style'" == "l connected") {
 					twoway line `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| connected `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 				else if ("`style'" == "c l"|"`style'" == "connected line"|"`style'" == "connected l"|"`style'" == "c line") {
 					twoway connected `outcome' `newtime' if `ids' == `x', yaxis(1) color("`y1color'") `xlabel' lw(`linewide') ylabel(`levsoutcome', valuelabel axis(1)) ytitle("") `options' ///
 						|| line `treat' `newtime' if `ids' == `x', yaxis(2) color("`y2color'") `xlabel' lw(`linewide') `options' ///
-						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options'
+						||, xtitle("") ytitle("",axis(2)) title("`lx'") name(graph_`x', replace) nodraw `options' ///
+					legend(region(lstyle(none) fcolor(none)) rows(1) size(*0.8) symxsize(3))
 						local graphs "`graphs' graph_`x'"
 				}
 
