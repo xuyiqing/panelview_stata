@@ -153,17 +153,6 @@ program define panelview
 	if r(N) == 0 {
 		error 2000
 	}
-/*	
-*sss
-	tempvar i_numeric labeli
-	*encode `i',gen(`i_numeric')
-	egen `i_numeric'=group(`i')
-	labmask `i_numeric', val(`i')
-	drop `i'
-	rename `i_numeric' `i'
-	label list `i'
-*sss
-*/
 
 	local ids `i'
 	local tunit `t'
@@ -176,12 +165,12 @@ program define panelview
 		*label list `ids'
 	}
 	else{ //numeric units indicator without labels or string variable:
-	capture confirm numeric variable abb
+	capture confirm numeric variable `ids'
 	if !_rc { //numeric units indicator without labels:
 		tempvar labelids
 		qui tostring `ids', gen(`labelids')
 		labmask `ids', val(`labelids') 
-		label list `ids'
+		*label list `ids'
 
 		egen `nids' = group(`ids')
 	}
