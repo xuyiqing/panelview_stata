@@ -97,6 +97,8 @@ program define panelview
 		}
 	}
 
+
+
     set trace off
 
 	preserve 
@@ -151,8 +153,17 @@ program define panelview
 	if r(N) == 0 {
 		error 2000
 	}
-	
-
+/*	
+*sss
+	tempvar i_numeric labeli
+	*encode `i',gen(`i_numeric')
+	egen `i_numeric'=group(`i')
+	labmask `i_numeric', val(`i')
+	drop `i'
+	rename `i_numeric' `i'
+	label list `i'
+*sss
+*/
 
 	local ids `i'
 	local tunit `t'
@@ -160,15 +171,29 @@ program define panelview
 	
 	tempvar nids
 	cap label list `ids' 
-	if "`r(k)'" != "" {
+	if "`r(k)'" != "" { //numeric units indicator with labels:
 		egen `nids' = group(`ids') 
+		*label list `ids'
 	}
-	else{
+	else{ //numeric units indicator without labels or string variable:
+	capture confirm numeric variable abb
+	if !_rc { //numeric units indicator without labels:
 		tempvar labelids
 		qui tostring `ids', gen(`labelids')
 		labmask `ids', val(`labelids') 
+		label list `ids'
+
 		egen `nids' = group(`ids')
-		
+	}
+	else { //string variable:
+		tempvar i_numeric labeli
+		encode `ids',gen(`i_numeric')
+		*label list `i_numeric'
+		drop `ids'
+		rename `i_numeric' `ids'
+	
+		egen `nids' = group(`ids')	
+	}
 	}
 	
 	qui levelsof `nids' if `touse'
@@ -454,14 +479,26 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 					}
 					else { // not ignore treatment:
 						if ("`bygroup'" != "" ) { //with bygroup:
-						twoway `lines1' by(`bgplotvalue', legend(off) note("") cols(1)) yscale(noline) xscale(noline) `options'
+						tempvar allunits 								
+						egen `allunits' = max(`ids') 
+						local largestlegend=3*`allunits'
+						local midlegend=2*`allunits'
+						twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated(Pre)" `largestlegend' "Treated(Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 						}
-						else{ //without bygroup:
+						else{ //without bygroup: prepost=on:
 						if (`"`prepost'"' != "") {
-						tw `lines1' legend(off) yscale(noline) xscale(noline) `options'
+							tempvar allunits 								
+							egen `allunits' = max(`ids') 
+							local largestlegend=3*`allunits'
+							local midlegend=2*`allunits'
+						tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated(Pre)" `largestlegend' "Treated(Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 						}
 							else { //prepost=off:
-								tw `lines1' legend(off) yscale(noline) xscale(noline) `options'
+								tempvar allunits								
+								egen `allunits' = max(`ids') 
+								local largestlegend=3*`allunits'
+								tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control"  `largestlegend' "Treated") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+								
 							}
 						}
 					}
@@ -498,14 +535,14 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 					}
 					else { // not ignore treatment:
 					if ("`bygroup'" != "" ) { //with bygroup:
-					twoway `dot1' by(`bgplotvalue', cols(1) note("")) legend(region(lstyle(none) fcolor(none)) note("") row(1) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)")) yscale(noline) xscale(noline) ytitle("`outcome'") xtitle("`tunit'") `options'
+					twoway `dot1' by(`bgplotvalue', cols(1) note("")) legend(region(lstyle(none) fcolor(none)) note("") row(1) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) ytitle("`outcome'") xtitle("`tunit'") `options'
 					} 
 					else{ //without bygroup:
 					if (`"`prepost'"' != "") {
-					tw `dot1' legend(region(lstyle(none) fcolor(none)) row(1) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)")) yscale(noline) xscale(noline) ytitle("`outcome'") xtitle("`tunit'") `options'
+					tw `dot1' legend(region(lstyle(none) fcolor(none)) row(1) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) ytitle("`outcome'") xtitle("`tunit'") `options'
 					}
 					else { //prepost=off:
-					tw `dot1' legend(region(lstyle(none) fcolor(none)) row(1) label(1 "Control") label(2 "Treated")) ytitle("`outcome'") xtitle("`tunit'") `options'
+					tw `dot1' legend(region(lstyle(none) fcolor(none)) row(1) label(1 "Control") label(2 "Treated") size(*0.8) symxsize(3) keygap(1)) ytitle("`outcome'") xtitle("`tunit'") `options'
 					}
 					}
 					}
