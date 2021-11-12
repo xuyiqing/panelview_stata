@@ -472,7 +472,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 						egen `allunits' = max(`ids') 
 						local largestlegend=3*`allunits'
 						local midlegend=2*`allunits'
-						twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated(Pre)" `largestlegend' "Treated(Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+						twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 						}
 						else{ //without bygroup: prepost=on:
 						if (`"`prepost'"' != "") {
@@ -480,7 +480,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 							egen `allunits' = max(`ids') 
 							local largestlegend=3*`allunits'
 							local midlegend=2*`allunits'
-						tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated(Pre)" `largestlegend' "Treated(Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+						tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 						}
 							else { //prepost=off:
 								tempvar allunits								
@@ -630,7 +630,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 				}
 				else { // not ignore treatment:
 				if (`"`prepost'"' != "") {
-					local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Control") label(2 "Treated(Pre)") label(3 "Treated(Post)") size(*0.6) symxsize(3) keygap(1)) xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1) xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
+					local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)") size(*0.6) symxsize(3) keygap(1)) xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1) xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 					}
 					
 					else {

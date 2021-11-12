@@ -248,10 +248,10 @@ panelview Y x if id >= 101 & id <= 112, i(id) t(time) continuoustreat discreteou
 /***** Line the discete treatment *****/
 * Y: continuous; D: discrete 
 use turnout.dta, clear
-panelview turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(line) type(bivar) byunit
+panelview turnout policy_edr policy_mail_in policy_motor if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(l l) type(bivar) byunit
 
-*Y: Discrete; D: discrete
+*Y: discrete; D: discrete
 use simdata.dta, replace
-panelview Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) style(l) type(bivar) byunit
+panelview Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4) style(l l) type(bivar) byunit
 
  

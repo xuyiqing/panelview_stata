@@ -161,9 +161,9 @@ The left y axis indicates outcome label; the right y axis indicates treatment la
 {p 6 6 2}Plot D and Y for each unit against time in the same graph. {p_end}
 
 {p 6 6 2}Use a line plot to represent (discrete) treatment status: {p_end}
-{phang2}. {stata panelview turnout policy_edr if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(line) type(bivar) byunit l1title("Y") r1title("D")}{p_end}
+{phang2}. {stata panelview turnout policy_edr if abb >= 1 & abb <= 12, i(abb) t(year) xlabdist(10) style(l l) type(bivar) byunit l1title("Y") r1title("D")}{p_end}
 
-{p 6 6 2}To better visualize a discrete treatment whose value is sometimes zero, we use {cmd:style(line)} to invoke line plots instead of bar plots.
+{p 6 6 2}To better visualize a discrete treatment whose value is sometimes zero, we use {cmd:style(l l)} to invoke line plots instead of bar plots.
 Instead of using {cmd:ytitle}, we use {cmd:l1title} and {cmd:r1title} to label the left and right axes, respectively. {p_end}
 
 
