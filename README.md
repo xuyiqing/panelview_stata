@@ -55,7 +55,7 @@ For the `sysuse` command to access example datasets of `panelview`, users should
 
 Manual installation takes three simple steps and will load the example datasets without additional work:
 
-1. Download the zip file from: https://github.com/xuyiqing/panelview_stata
+1. Download the zip file from: https://yiqingxu.org/packages/panelView/panelview_stata.zip
 2. Unzip the file
 3. Type the following commands in your STATA console:
 
