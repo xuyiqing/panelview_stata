@@ -152,10 +152,10 @@ panelview Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteout
 
 use capacity.dta, clear 
 * Continuous Outcome: Capacity; Continuoustreat: polity2
-panelview Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring Stata Capacity") legend(off) theme(bw)
+panelview Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring State Capacity") legend(off) theme(bw)
 
 use capacity.dta, clear 
-panelview Capacity demo lngdp, i(ccode) t(year) type(outcome) title("Measuring Stata Capacity") ignoretreat
+panelview Capacity demo lngdp, i(ccode) t(year) type(outcome) title("Measuring State Capacity") ignoretreat
 
 * Treatment indicator has more than 2 treatment levels
 * Continuous Outcome: Capacity
@@ -164,7 +164,7 @@ gen demo2 = 0
 replace demo2 = -1 if polity2 < -0.5
 replace demo2 = 1 if polity2 > 0.5
 tab demo2, m 
-panelview Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring Stata Capacity") legend(off) // numlevstreat = 3
+panelview Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring State Capacity") legend(off) // numlevstreat = 3
 
 
 * Discrete outcome

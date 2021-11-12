@@ -1,4 +1,4 @@
-# `panelview` in STATA: Visualizing Panel Data
+# `panelview` in Stata: Visualizing Panel Data
 
 The **`panelview`** package has three main functionalities:
 
@@ -32,7 +32,7 @@ __Table of Contents__
 
 ## 0. Installation
 
-Type the following commands in your STATA console:
+Type the following commands in your Stata console:
 
 ```
 cap ado uninstall panelview //in-case already installed
@@ -259,7 +259,7 @@ With a continuous treatment variable (e.g. `polity2`), the treatment status will
 ```
 use capacity.dta, clear 
 * Continuous Outcome: Capacity; Continuoustreat: polity2
-panelview Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring Stata Capacity") legend(off) theme(bw)
+panelview Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring State Capacity") legend(off) theme(bw)
 ```
 
 <img src="./graph/Graph31.png">
@@ -268,7 +268,7 @@ Same as the following two commands:
 
 ```
 use capacity.dta, clear 
-panelview Capacity demo lngdp, i(ccode) t(year) type(outcome) title("Measuring Stata Capacity") ignoretreat legend(off)
+panelview Capacity demo lngdp, i(ccode) t(year) type(outcome) title("Measuring State Capacity") ignoretreat legend(off)
 ```
 
 ```
@@ -279,7 +279,7 @@ gen demo2 = 0
 replace demo2 = -1 if polity2 < -0.5
 replace demo2 = 1 if polity2 > 0.5
 tab demo2, m 
-panelview Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring Stata Capacity") legend(off) // number of treatment level = 3
+panelview Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Measuring State Capacity") legend(off) // number of treatment level = 3
 
 ```
 
