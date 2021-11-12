@@ -32,39 +32,12 @@ __Table of Contents__
 
 ## 0. Installation
 
-We provide 2 methods for the installation of  `panelview`:
-
-### Installation from GitHub
-
-As a pre-requisite, the `github` package needs to be installed:
-
-```
-net install github, from("https://haghish.github.io/github/")
-```
-
-Then install the `panelview` package with Stata v15 or greater: 
+Type the following commands in your STATA console:
 
 ```
 cap ado uninstall panelview //in-case already installed
-github install xuyiqing/panelview_stata
+net install panelview, all replace from("https://yiqingxu.org/packages/panelView_stata")
 ```
-
-For the `sysuse` command to access example datasets of `panelview`, users should download the datasets (`capacity.dta`, `simdata.dta`, `turnout.dta`) and place them in the directories searched by Stata from `adopath`, as Stata's download commmands would not do that automatically.
-
-### Manual Installation
-
-Manual installation takes three simple steps and will load the example datasets without additional work:
-
-1. Download the zip file from: https://yiqingxu.org/packages/panelView/panelview_stata.zip
-2. Unzip the file
-3. Type the following commands in your STATA console:
-
-```
-cap ado uninstall panelview //in-case already installed
-net install panelview, all replace from(your full local path)
-```
-
- 
 
 ------
 
