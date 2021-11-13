@@ -33,7 +33,8 @@ program define panelview
 	//check needed packages
 	cap which colorpalette.ado
 	if _rc {
-		di as error "colorpalette.ado required: {stata net install gr0075.pkg, replace}"
+		di as error "colorpalette.ado required: {stata ssc install palettes, replace}"
+		*di as error "colorpalette.ado required: {stata net install gr0075.pkg, replace}"
 		exit 199
 	}
 	
@@ -51,7 +52,7 @@ program define panelview
 
 	cap which grc1leg.ado
 	if _rc {
-		di as error "grc1leg.ado required: {stata net install grc1leg}"
+		di as error "grc1leg.ado required: {stata net install grc1leg, from(http://www.stata.com/users/vwiggins) replace}"
 		exit 199
 	}
 	
