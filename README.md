@@ -32,9 +32,14 @@ __Table of Contents__
 
 ## 0. Installation
 
-Type the following commands in your Stata console:
+Firstly, we need to install 4 dependencies, including: `grc1leg`, ` gr0075`, `labutil`, and `sencode`. Type the following commands in your Stata console:
 
 ```
+net install grc1leg, from(http://www.stata.com/users/vwiggins) replace
+net install gr0075, from(http://www.stata-journal.com/software/sj18-4) replace
+ssc install labutil, replace
+ssc install sencode, replace
+
 cap ado uninstall panelview //in-case already installed
 net install panelview, all replace from("https://yiqingxu.org/packages/panelView_stata")
 ```
