@@ -440,7 +440,6 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		di "now display lines of continuous outcome"
 		loc lines1
 		
-
 		foreach w of loc levsplot {
 			foreach x of loc levsnids {
 					if (`"`prepost'"' != "" & `w' == 1 ) { 
@@ -470,22 +469,22 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 					else { // not ignore treatment:
 						if ("`bygroup'" != "" ) { //with bygroup:
 						tempvar allunits 								
-						egen `allunits' = max(`ids') 
-						local largestlegend=3*`allunits'
+						egen `allunits' = max(`nids') 
+						local largestlegend=3*`allunits'+1
 						local midlegend=2*`allunits'
 						twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 						}
 						else{ //without bygroup: prepost=on:
 						if (`"`prepost'"' != "") {
 							tempvar allunits 								
-							egen `allunits' = max(`ids') 
-							local largestlegend=3*`allunits'
+							egen `allunits' = max(`nids') 
+							local largestlegend=3*`allunits'+1
 							local midlegend=2*`allunits'
 						tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 						}
 							else { //prepost=off:
 								tempvar allunits								
-								egen `allunits' = max(`ids') 
+								egen `allunits' = max(`nids') 
 								local largestlegend=3*`allunits'
 								tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control"  `largestlegend' "Treated") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 								
