@@ -28,9 +28,12 @@ program define panelview
 	*								///
 	]
 	
+	//check if i and t uniquely identify the obs:
+	isid `i' `t'
 
 
 	//check needed packages
+
 	cap which colorpalette.ado
 	if _rc {
 		*di as error "colorpalette.ado required: {stata ssc install palettes, replace}"
@@ -101,6 +104,13 @@ program define panelview
 
 
     set trace off
+
+	//check if "type" is specified correctly:
+	if ("`type'" != "miss" & "`type'" != "missing" & "`type'" != "treat" & "`type'" != "outcome" & "`type'" != "bivar" &"`type'" != "bivariate") {
+				di as err ///
+				"option type can only be one of the following: treat, outcome, bivariate (bivar), and missing (miss)"
+				exit 198
+			}
 
 	preserve 
 	tempfile backup
