@@ -70,18 +70,17 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 {phang2}. {stata sysuse turnout, clear}{p_end}
 
 {pstd}Basic syntax{p_end}
-{phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status")}{p_end}
+{phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status", size(medium))}{p_end}
 
-{p 6 6 2} In this plot, {cmd: turnout} is the outcome, {cmd: policy_edr} is the treatment, {cmd: policy_mail_in} and {cmd: policy_motor} are the covariates.{p_end}
+{p 6 6 2} In this plot, {cmd: turnout} is the outcome, {cmd: policy_edr} is the treatment, {cmd: policy_mail_in} and {cmd: policy_motor} are the covariates.
+Here we change the texts and sizes of titles using {cmd: xtitle}, {cmd: ytitle}, and {cmd: title}. For more choice of text size style, click {it:{help textsizestyle:here}}.{p_end}
 
 {p 6 6 2} For panel data with a staggered adoption design, we can distinguish the pre- and post-treatment periods for treated units by specifying {cmd:prepost}:
 {p_end}
 {phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) prepost}{p_end}
 
-
-{phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) bytiming legend(label(1 "No EDR") label(2 "EDR"))}{p_end}
-
-{p 6 6 2}use {cmd:bytiming} to sort units by the timing of receiving the treatment and use {cmd:legend} to change labels in the legend. {p_end}
+{p 6 6 2}Use {cmd:bytiming} to sort units by the timing of receiving the treatment. We also use {cmd:label} and {cmd:size} options inside {cmd: legend} to specify label and size of the legend: {p_end}
+{phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) bytiming legend(label(1 "No EDR") label(2 "EDR") size(vsmall))}{p_end}
 
 
 {pstd}Change the color schemes for the controls and treated using the {cmd:mycolor} option. For example, {cmd:PuBu} indicates light purple to blue:{p_end}
@@ -121,7 +120,7 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 
 {pstd}Continuous Outcomes{p_end}
 {phang2}. {stata sysuse turnout, clear}{p_end}
-{phang2}. {stata panelview turnout policy_edr, i(abb) t(year) type(outcome) prepost ylabel(0 (25) 100)}{p_end}
+{phang2}. {stata panelview turnout policy_edr, i(abb) t(year) type(outcome) prepost ylabel(0 (25) 100, labsize(small)) xlabel(, labsize(small))}{p_end}
 
 {p 6 6 2}The three different colors represent the pure control units, treated units in the pre-treatment periods, and treated units in the post-treatment period. {p_end}
 {p 6 6 2}Different from a treatment status plot, an outcome plot does not allow {cmd:xlabdist} and {cmd:ylabdist}. Instead, {cmd:xlabel} and {cmd:ylabel} can be used to adjust looks of axis labels. {p_end}
