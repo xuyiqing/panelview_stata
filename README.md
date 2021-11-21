@@ -364,7 +364,9 @@ panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type"
 
 ### 4.4 Continuous treatment
 
-Plot the continuous treatment variable by `continuoustreat`. 
+Plot the continuous treatment variable by `continuoustreat`. We convert the continuous treatment variable into five groups according to its treatment levels. 
+
+In the following example, `polity2` ranges from -1 to 1. When `polity2` is in the lowest category (-1), it ranges from -1 to (but not including) -0.5. When `polity2` is in the -0.5 category, it ranges from -0.5 to (but not including) 0. When `polity2` is in the 0 category, it ranges from 0 to (but not including) 0.5. When `polity2` is in the 0.5 category, it ranges from 0.5 to (but not including) 1. When `polity2` is in the 1 category, it indicates observations when `polity2` is equal to 1.
 
 ```
 use capacity.dta, clear

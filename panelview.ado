@@ -126,10 +126,14 @@ program define panelview
 
 
 	if `numvar' == 1 {
-		if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing") {
-				di as err "should combine with option type(missing) or ignoretreat when varlist has only one variable" 
+		if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing" & "`type'" != "treat") {
+				di as err "should combine with option ignoretreat, type(missing), or type(treat) when varlist has only one variable" 
 				exit 198
 		} 
+		else if ("`type'" == "treat") {
+			tokenize `varlist'
+			loc treat `1'
+		}
 		else {
 			tokenize `varlist'
 			loc outcome `1'
@@ -198,6 +202,7 @@ program define panelview
 	
 	qui levelsof `nids' if `touse'
 	loc numids = r(r)
+
 
 	
 
@@ -314,6 +319,7 @@ program define panelview
 			else { 
 				if ("`type'" == "outcome" & `numlevstreat' > 2) {
 				cap gen `plotvalue' = 0
+				di "The number of treatment level is > 2; the treatment status is therefore ignored."
 				}
 				else {	
 				cap gen `plotvalue' = `treat'
@@ -657,8 +663,23 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 						loc contrlev2 `2'
 						loc contrlev3 `3'
 						loc contrlev4 `4'
-						loc contrlev5 `5'					
-						local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4 5) label(1 "`contrlev1'") label(2 "`contrlev2'") label(3 "`contrlev3'") label(4 "`contrlev4'") label(5 "`contrlev5'") title("Treatment Levels: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
+						loc contrlev5 `5'
+						loc contrlev11=round(`1', 0.001)
+						loc contrlev22=round(`2', 0.001)
+						loc contrlev33=round(`3', 0.001)
+						loc contrlev44=round(`4', 0.001)
+						loc contrlev55=round(`5', 0.001)
+						*di `contrlev11'
+						*di `contrlev22'
+						*di `contrlev33'
+						*di `contrlev44'
+						*di `contrlev55'
+						if `contrlev55' > `contrlev44' {
+							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4 5) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") label(5 "`contrlev55'") title("Treatment Levels: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
+						}
+						else {
+							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") title("Treatment Levels: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
+						}
 						}
 						else {
 							if `numlevstreat' > 2 {
