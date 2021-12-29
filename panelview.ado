@@ -1,6 +1,6 @@
 /*
 Version 0.1
-Nov 07 2021
+Dec 28 2021
 Hongyu Mou, Yiqing Xu
 */
 
@@ -122,7 +122,7 @@ program define panelview
 
 	qui ds `varlist'
 	tempvar numvar
-	gen `numvar' = `: word count `r(varlist)''
+	cap gen `numvar' = `: word count `r(varlist)''
 
 
 	if `numvar' == 1 {
@@ -168,6 +168,11 @@ program define panelview
 	if r(N) == 0 {
 		error 2000
 	}
+	else if r(N) > 1000 { //limit the obs:
+		di as err "Please limit your observations within 1000 for elegant presentations"
+		exit 198
+	}
+
 
 	local ids `i'
 	local tunit `t'
@@ -209,11 +214,11 @@ program define panelview
 	// ignore treatment:
 	tempvar gcontrol
 	if ("`continuoustreat'" != "" & "`type'" == "outcome") { 
-			gen `gcontrol' = 1 
+			cap gen `gcontrol' = 1 
 	}
 	else {
     if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") { 
-			gen `gcontrol' = 1 
+			cap gen `gcontrol' = 1 
 			} 
 			else { 
 			qui levelsof `treat' if `touse', loc (levstreat)
@@ -228,7 +233,7 @@ program define panelview
 			else {
 				if (`numlevstreat' == 1) {
 					di "Only one treatment level"
-					gen `gcontrol' = 1 
+					cap gen `gcontrol' = 1 
 				}
 				else { 
 					if  ("`prepost'" != "") { 
@@ -243,7 +248,7 @@ program define panelview
 						}
 						}
 						else {
-							gen `gcontrol' = 1
+							cap gen `gcontrol' = 1
 						}
 					}
 				}
@@ -296,6 +301,21 @@ program define panelview
 	labmask `newtime', val(`labeltime')
 
 
+	//indicate the last period as a different colored dot in outcome plot if only treated in the last period:
+		tempvar lastchangedot maxtime maxtime2 dtreat islastchangedot
+		cap bysort `nids': gen `maxtime' = `tunit'[_N]
+		cap bysort `nids': gen `maxtime2' = `tunit'[_N-1]
+		cap gen `lastchangedot' = 0
+		cap bysort `nids': replace `lastchangedot' = 1 if `treat' == 1 & `tunit' == `maxtime'
+		cap bysort `nids': gen `dtreat' = `treat'[_N] - `treat'[_N-1] if `lastchangedot' == 1
+		cap bysort `nids': replace `lastchangedot' = 0 if `dtreat' == 0
+
+		cap count if `lastchangedot' == 1
+		loc islastchangedot = (r(N) != 0)
+		*di `islastchangedot'
+
+
+/*
 	//paint the period right before treatment:
 	if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing") {
 	if ("`type'" == "outcome" & "`discreteoutcome'" == "" ) { 
@@ -303,10 +323,10 @@ program define panelview
 			tempvar L1_labeltime L1_time
 			cap bys `nids': gen `L1_labeltime' = `labeltime'[_n-1] if `treat' >= 1
 			cap bys `nids': egen `L1_time' = min(`L1_labeltime')
-			cap replace `treat' = 1 if `labeltime' == `L1_time'			
+			cap replace `treat' = 1 if `labeltime' == `L1_time'		
 		}
 	}
-
+*/
 
 	tempvar plotvalue 
 	if ("`continuoustreat'" != "" & "`type'" == "outcome") {
@@ -343,6 +363,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 	qui levelsof `plotvalue' if `touse', loc (levsplot) 
 	loc numlevsplot = r(r) 
+	
 
 	if ("`ignoretreat'" == "") { 
 	if ("`continuoustreat'" == "" | "`type'" != "outcome") {
@@ -369,7 +390,10 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		}
 	}
 	}
-	
+
+
+
+
 	//deciding color
 	colorpalette "198 219 239" "eltblue" "66 146 198" "31 120 180" "8 81 156", n(`numlevsplot') nograph
 
@@ -388,6 +412,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		}
 	}
 	
+	
 	qui return list
 	tokenize `levsplot' 
 	loc trpreortr `2'
@@ -399,14 +424,15 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		cap gen `nopre' = 0
 	}
 
-	if `nopre' != 1 {
+
+	if `nopre' != 1 { 
 		foreach w of loc levsplot {
-		loc uu = `w' + 1 
+		loc uu = `w' + 1 //012 -> 123
 		loc col`w' = r(p`uu')
 		// colorpalette stores #th color in r(p#) 
 		}
 	}
-	else {
+	else { 
 		foreach w of loc levsplot {
 			if `w' == 0 {
 				loc uu = `w' + 1
@@ -443,9 +469,13 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 	
 		tempvar bgplotvalue labplotvalue
 		bysort `nids': egen `bgplotvalue' = min(`plotvalue')
+		*di `levsplot'
+		qui levelsof `bgplotvalue' if `touse', loc (bglevsplot)
+		*di `bglevsplot'
+
 		label define `labplotvalue' 0 "Always Under Control" 1 "Treatment Status Changed" 2 "Always Treated"
 		label val `bgplotvalue' `labplotvalue'
-
+		*tab `nids' if `bgplotvalue'==2, m
 
 
 
@@ -460,11 +490,21 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 			foreach x of loc levsnids {
 					if (`"`prepost'"' != "" & `w' == 1 ) { 
 					//with prepost: `w' == 1: treated(pre)
-						loc lines1 `" `lines1' || line `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse' , lcolor("`col`w''")"'
+					if `islastchangedot' == 0 {
+						loc lines1 `" `lines1' || line `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse', lcolor("`col`w''")"'
+					}
+					else{
+						loc lines1 `" `lines1' || line `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse', lcolor("`col`w''") || scatter `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse' & `lastchangedot' == 1, mcolor("`col`3''") msize(vsmall)"'
+					}
 					} 
 					else if (`"`prepost'"' == "" & `w' == 0 ) { 
 					//without prepost: `w' == 0: treated(pre)
+					if `islastchangedot' == 0 {
 						loc lines1 `" `lines1' || line `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse' , lcolor("`col`w''")"'
+						}
+					else{
+						loc lines1 `" `lines1' || line `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse', lcolor("`col`w''") || scatter `outcome' `tunit' if `nids' == `x' & `gcontrol' == 0 & `touse' & `lastchangedot' == 1, mcolor("`col`2''") msize(vsmall)"'
+					}
 					}
 				loc lines1 `" `lines1' || line `outcome' `tunit' if `nids' == `x' & `plotvalue' == `w' & `touse' , lcolor("`col`w''")"' 
 			}
@@ -484,26 +524,49 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 					}
 					else { // not ignore treatment:
 						if ("`bygroup'" != "" ) { //with bygroup:
-						tempvar allunits 								
-						egen `allunits' = max(`nids') 
-						local largestlegend=3*`allunits'+1
-						local midlegend=2*`allunits'
-						twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+						if `islastchangedot' == 0 {
+								tempvar allunits 								
+								egen `allunits' = max(`nids') 
+								local largestlegend = 3*`allunits' + 1
+								local midlegend = 2*`allunits'
+								twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+						}
+						else {
+								tempvar allunits 								
+								egen `allunits' = max(`nids') 
+								local largestlegend = `allunits' + 2
+								local midlegend = `allunits' + 1
+								twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+							}
 						}
 						else{ //without bygroup: prepost=on:
 						if (`"`prepost'"' != "") {
-							tempvar allunits 								
-							egen `allunits' = max(`nids') 
-							local largestlegend=3*`allunits'+1
-							local midlegend=2*`allunits'
-						tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
-						}
-							else { //prepost=off:
-								tempvar allunits								
+							if `islastchangedot' == 0 {
+								tempvar allunits 								
 								egen `allunits' = max(`nids') 
-								local largestlegend=3*`allunits'
-								tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control"  `largestlegend' "Treated") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
-								
+								local largestlegend = 3*`allunits' + 1
+								local midlegend = 2*`allunits'
+								tw `lines1'  legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+							}
+							else {
+								tempvar allunits 								
+								egen `allunits' = max(`nids') 
+								local largestlegend = `allunits' + 2
+								local midlegend = `allunits' + 1
+								tw `lines1'  legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+							}
+						}
+							else { //prepost = off:
+								if `islastchangedot' == 0 {
+									tempvar allunits								
+									egen `allunits' = max(`nids') 
+									local largestlegend=3*`allunits'
+									tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control"  `largestlegend' "Treated") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+								}
+								else {
+									tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control"  2 "Treated") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
+
+								}
 							}
 						}
 					}
@@ -640,11 +703,11 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 			if ("`ignoretreat'" != "" | `numlevsplot'==1) { // ignore treatment:
 			local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1) label(1 "Observed") size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 			} 
-			else { 
+			else { // not ignore treatment:
 				if `nopre' == 1 {
-				local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2) label(1 "Control") label(2 "Treated") size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'	
+					local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2) label(1 "Control") label(2 "Treated") size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'	
 				}
-				else { // not ignore treatment:
+				else { 
 				if (`"`prepost'"' != "") {
 					local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)") size(*0.6) symxsize(3) keygap(1)) xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1) xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 					}
@@ -669,11 +732,6 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 						loc contrlev33=round(`3', 0.001)
 						loc contrlev44=round(`4', 0.001)
 						loc contrlev55=round(`5', 0.001)
-						*di `contrlev11'
-						*di `contrlev22'
-						*di `contrlev33'
-						*di `contrlev44'
-						*di `contrlev55'
 						if `contrlev55' > `contrlev44' {
 							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4 5) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") label(5 "`contrlev55'") title("Treatment Levels: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 						}
@@ -695,7 +753,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Treatment Level: `trlev1'") label(2 "Treatment Level: `trlev2'") label(3 "Treatment Level: `trlev3'") size(*0.55) symxsize(3) keygap(0.5) colgap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 								}
 							}
-							else {
+							else { //treatment levels = 2:
 								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2) label(1 "Control") label(2 "Treated") size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 							}
 						}

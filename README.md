@@ -20,7 +20,7 @@ We develop this package in the belief that it is always a good idea to understan
 
 Please report bugs to  hongyumou5@gmail.com or yiqingxu@stanford.edu.
 
-We thank Yifan Huang for the initial coding and Ziyi Liu for the kind suggestion.
+We thank Yifan Huang for an early version of the program and Ziyi Liu for helpful suggestions.
 
 ------
 
