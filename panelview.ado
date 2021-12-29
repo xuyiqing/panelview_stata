@@ -1,6 +1,6 @@
 /*
 Version 0.1
-Dec 28 2021
+Dec 29 2021
 Hongyu Mou, Yiqing Xu
 */
 
@@ -168,14 +168,18 @@ program define panelview
 	if r(N) == 0 {
 		error 2000
 	}
-	else if r(N) > 1000 { //limit the obs:
-		di as err "Please limit your observations within 1000 for elegant presentations"
-		exit 198
-	}
 
 
 	local ids `i'
 	local tunit `t'
+
+	//limit the unit number:
+	by `i', sort: gen nvals = _n == 1 
+	qui count if nvals 
+	if r(N) > 1000 {
+		di as err "Please limit your units within 1000 for elegant presentations"
+		exit 198
+	}
 	
 	
 	tempvar nids
