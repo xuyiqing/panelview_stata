@@ -39,7 +39,18 @@ net install grc1leg, from(http://www.stata.com/users/vwiggins) replace
 net install gr0075, from(http://www.stata-journal.com/software/sj18-4) replace
 ssc install labutil, replace
 ssc install sencode, replace
+```
 
+To install the `panelview` package with Stata version 15.1 or greater, one way is through `ssc install`: 
+
+```
+cd "your_full_local_path_to_ado_folder"
+ssc install panelview, all
+```
+
+Another way is through `net install` to install the latest version of `panelview`: 
+
+```
 cap ado uninstall panelview //in-case already installed
 net install panelview, all replace from("https://yiqingxu.org/packages/panelView_stata")
 ```

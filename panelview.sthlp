@@ -127,7 +127,7 @@ Here we change the texts and sizes of titles using {cmd: xtitle}, {cmd: ytitle},
 
 {phang2}. {stata panelview turnout policy_edr, i(abb) t(year) type(outcome) bygroup prepost xlabel(1920 (20) 2000)}{p_end}
 
-{p 6 6 2}Because {cmd:bygroup}is invoked, {cmd: panelview} analyzes the data and automatically put each unit into different groups based on the changes of their treatment statuses,
+{p 6 6 2}Because {cmd:bygroup} is invoked, {cmd: panelview} analyzes the data and automatically put each unit into different groups based on the changes of their treatment statuses,
 e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed.
 {cmd:prepost} distinguishes pre- and post-treatment periods in group (3).{p_end}
 
