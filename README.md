@@ -22,7 +22,8 @@ We develop this package in the belief that it is always a good idea to understan
 
 **Update in v.0.1.1:** 
 
-​	Add option `leavegap` to keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data).
+1. Add option `leavegap` to keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data).
+1. Add option `ignoreY` to show treatment status of the first variable in the varlist instead of the second (e.g., D in formula is D X, instead of X). It needs to be combined with `type(treat)`. If there is only one variable in the varlist, the option is turned on by default.
 
 Please report bugs to  hongyumou5@gmail.com or yiqingxu@stanford.edu.
 
@@ -76,6 +77,7 @@ panelview Y D X [if] [in], 			      ///
 	discreteoutcome						   				///
 	bytiming							   						///
 	ignoretreat							   				  ///
+	ignoreY															///
 	MYCOLor(string)						   				///
 	PREpost					 			   						///
 	xlabdist(integer 1)					   			/// 
@@ -102,6 +104,7 @@ where the subcommand can be:
 | `discreteoutcome`         | When a variable is discrete, make sure `panelview` respects its discreteness in `type(outcome)` plots. |
 | `bytiming`                | Sort units by the timing of first receiving the treatment; if the timing is the same, then by the total number of periods exposed to the treatment. |
 | `ignoretreat` | Omit the treatment indicator, that is, any variables after `Y` will be interpreted as covariates. |
+| `ignoreY` | Show treatment status of the first variable in the varlist instead of the second (e.g., D in formula is D X, instead of X). It needs to be combined with `type(treat)` . If there is only one variable in the varlist, the option is turned on by default. |
 | `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). |
 | `PREpost`            | Distinguish the pre- and post-treatment periods for treated units. |
 | `xlabdist()` and `ylabdist()` | Change integer gaps between labels on the x- and y-axes. Default is 1. |
@@ -197,6 +200,15 @@ panelview lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) title(
 ```
 
 <img src="./graph/Graph7.png">
+
+If the varlist formula is D X, instead of Y D X, we can use `ignoreY` to show treatment status of D, which do not take the missing status of Y into consideration: 
+
+```
+*ignoreY
+panelview demo lngdp , i(country) t(year) type(treat) mycolor(Reds) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) ignoreY
+```
+
+<img src="./graph/Graph_ignoreY.png">
 
 Sorting units based on the first period a unit receives the treatment gives a more appealing visual:
 

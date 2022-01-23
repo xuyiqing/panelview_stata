@@ -16,6 +16,7 @@ program define panelview
 	discreteoutcome					///
 	bytiming						///
 	ignoretreat						///
+	ignoreY							///
 	MYCOLor(string)					///
 	PREpost							///
 	xlabdist(integer 1)				/// 
@@ -102,6 +103,14 @@ program define panelview
 		}
 	}
 
+	if ("`type'" != "treat") {
+		if ("`ignoreY'" != "") {
+			di as err ///
+			"option ignoreY should be combined with type(treat)"
+			exit 198
+		}
+	}
+
 
 
     set trace off
@@ -144,20 +153,31 @@ program define panelview
 		}
 	}
 	else if  `numvar' == 2 {
-		if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") {
+		if ("`ignoreY'" != "") {
 			tokenize `varlist'
-			loc outcome `1'
 			loc treat `1'
-			*loc covariates `2' 
-			*drop if mi(`covariates')
-			} 
-			else {
-			tokenize `varlist'
-			loc outcome `1'
-			loc treat `2'
+		}
+		else {
+			if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") {
+				tokenize `varlist'
+				loc outcome `1'
+				loc treat `1'
+				*loc covariates `2' 
+				*drop if mi(`covariates')
+				} 
+				else {
+				tokenize `varlist'
+				loc outcome `1'
+				loc treat `2'
+			}
 		}
 	} 
 	else { //`numvar' >= 3:
+	if ("`ignoreY'" != "") {
+			tokenize `varlist'
+			loc treat `1'
+		}
+		else {
 		if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") { 
 			tokenize `varlist'
 			loc outcome `1'
@@ -167,6 +187,7 @@ program define panelview
 			loc outcome `1'
 			loc treat `2'
 		}
+	}
 	}
 
 
@@ -275,7 +296,7 @@ program define panelview
 					else {
 						if (`numlevstreat' >= 5) {
 						if ( "`continuoustreat'" == "") {
-							di as err " If the number of treatment levels >= 5, need to combine with Continuoustreat"
+							di as err " If the number of treatment levels >= 5, need to combine with option continuoustreat"
 							exit 198
 						}
 						}
@@ -545,7 +566,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 	if (`"`mycolor'"' != "Greys" & `"`mycolor'"' != "") { 
 		if ( "`theme'" == "bw") {
-			di as err " If mycolor is not Greys, mycolor cannot combine with theme(bw)"
+			di as err " If mycolor is not Greys, mycolor cannot combine with option theme(bw)"
 			exit 198
 		}
 	}

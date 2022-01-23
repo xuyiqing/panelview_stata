@@ -35,6 +35,8 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 {synopt:{opt discreteoutcome}}when a variable is discrete, make sure {cmd: panelview} respects its discreteness in {cmd: type(outcome)} plots{p_end}
 {synopt:{opt bytiming}}sorts units by when they first receive the treatment; if the timing is the same, then by the total number of periods exposed to the treatment{p_end}
 {synopt:{opt ignoretreat}}omits the treatment indicator, that is, any variables after {cmd: Y} will be interpreted as covariates; useful in a {cmd:type(outcome)} plot{p_end}
+{synopt:{opt ignoreY}}shows treatment status of the first variable in the varlist instead of the second (e.g., D in formula is D X, instead of X).
+It needs to be combined with {cmd:type(treat)}. If there is only one variable in the varlist, the option is turned on by default{p_end}
 {synopt:{opt mycol:or(string)}}changes the color schemes; click {it:{help colorpalette:here}} for sequential colors (3-9 colors){p_end}
 {synopt:{opt pre:post}}distinguishes the pre- and post-treatment periods for treated units{p_end}
 {synopt:{opt xlabdist(integer)}}changes the gap between labels on the x-axis; default is {cmd: 1}{p_end}
@@ -45,7 +47,7 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 {synopt:{opt byunit}}plots the outcome and treatment variables against time by each unit when {cmd: type(bivariate)} is invoked{p_end}
 {synopt:{opt theme(bw)}}uses the black and white theme (default when specified {cmd:type(bivar)}){p_end}
 {synopt:{opt lwd()}}sets the line width in {cmd:type(bivar)}. Default is {cmd:medium}{p_end}
-{synopt:{opt leavegap}}Keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data){p_end}
+{synopt:{opt leavegap}}keeps the time gap as an white bar if time is not evenly distributed (possibly due to missing data){p_end}
 {synopt:{opt *}}Common graph options, such as {cmd:title}, {cmd:ytitle}, {cmd:xtitle}, {cmd:xlabel}, {cmd:ylabel}, and {cmd:legend}, can be applied in {cmd:panelview} as well.
 
 {synoptline}
