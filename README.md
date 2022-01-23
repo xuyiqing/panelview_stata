@@ -58,7 +58,7 @@ Another way is through `net install` to install the latest version of `panelview
 
 ```
 cap ado uninstall panelview //in-case already installed
-net install panelview, all replace from("https://yiqingxu.org/packages/panelView_stata")
+net install panelview, all replace from("https://yiqingxu.org/packages/panelview_stata")
 ```
 
 ------
