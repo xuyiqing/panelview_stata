@@ -20,7 +20,7 @@ We develop this package in the belief that it is always a good idea to understan
 
 **Reference:** Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive.
 
-**Update in v.1.1:** 
+**Update in v.0.1.1:** 
 
 ​	Add option `leavegap` to keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data).
 
