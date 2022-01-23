@@ -12,11 +12,17 @@ We develop this package in the belief that it is always a good idea to understan
 
 ------
 
-**Date:** November 07, 2021
+**Date:** January 23, 2022
 
-**Version:** 0.1 ([Github](https://github.com/xuyiqing/panelview_stata)) 
+**Version:** 0.2 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
 
 **Authors:** Hongyu Mou, Yiqing Xu
+
+**Reference:** Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive.
+
+**Update in v.0.2:** 
+
+​	Add option `leavegap` to keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data).
 
 Please report bugs to  hongyumou5@gmail.com or yiqingxu@stanford.edu.
 
@@ -32,7 +38,7 @@ __Table of Contents__
 
 ## 0. Installation
 
-Firstly, we need to install 4 dependencies, including: `grc1leg`, ` gr0075`, `labutil`, and `sencode`. Type the following commands in your Stata console:
+Firstly, we need to install 4 dependencies, including `grc1leg`, ` gr0075`, `labutil`, and `sencode`. Type the following commands in your Stata console:
 
 ```
 net install grc1leg, from(http://www.stata.com/users/vwiggins) replace
@@ -79,6 +85,7 @@ panelview Y D X [if] [in], 			      ///
 	byunit								   						///
 	theme(string)						   					///
 	lwd(string)							   					///
+	leavegap														///
 	*									   								///
 	]
 ```
@@ -103,6 +110,7 @@ where the subcommand can be:
 | `byunit`                  | Plot the outcome and treatment variables against time by each unit when `type(bivar)` is invoked. |
 | `theme(bw)`               | Use the black and white theme (default when specified `type(bivar)`). |
 | `lwd()`             | Set the line width in `type(bivar)`  (default is `medium`).  |
+| `leavegap` | Keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data). |
 
 ------
 
@@ -114,7 +122,7 @@ First, we show how to visualize the dichotomous treatment conditions in a panel 
 
 Using the `turnout` dataset (a balanced panel), we show the treatment status of Election Day Registration (EDR) in each state in a given year ([Xu 2017](http://dx.doi.org/10.1017/pan.2016.2)). We can use the `title` option to change the title of the plot and change the titles of x- and y-axes through `xtitle` and `ytitle`, respectively. For DID-type panel data with a dichotomous treatment indicator, we can distinguish the pre- and post-treatment periods for treated units by specifying `prepost`.
 
-In the plot below,` turnout` is the outcome, `policy_edr` is the treatment, `policy_mail_in` and `policy_motor` are covariates.
+In the plot below,` turnout` is the outcome, `policy_edr` is the treatment, `policy_mail_in` and `policy_motor` are covariates. Including covariates may change the plot because of missing values in these covariates.
 
 ```
 use turnout.dta, clear 
@@ -167,6 +175,18 @@ panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(tr
 
 <img src="./graph/Graph6.png">
 
+if time is not evenly distributed, we can use `leavegap` to keep the time gap as an white bar. Otherwise, we will skip the time gap with an warning "Time is not evenly distributed (possibly due to missing data)."
+
+```
+*leavegap
+drop if year==1924
+drop if year==1928
+drop if year==1940
+panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) leavegap
+```
+
+<img src="./graph/Graph_leavgap.png">
+
 ### 2.2 Treatment: missing & switch on and off
 
 For a panel dataset in which the treatment may switch on and off, we no longer differentiate between pre- and post-treatment statuses. To demonstrate how `panelview` can be used in a more general setting, the following plot uses the `capacity` dataset, which is used to investigate the effect of democracy, the treatment, on state capacity, the outcome ([Wang and Xu 2018](http://journals.sagepub.com/doi/full/10.1177/2053168018772398)). `demo` is a binary indicator of regime type. From the figure below, we see quite a few cases of democratic reversals and that there are many missing values (the white area). We use the `xlabdist` and   `ylabdist` option to change the gaps between labels on the x- and y-axes: 
@@ -190,7 +210,7 @@ panelview lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) title("
 Instead of indicate `country` as units, we use `i(ccode)` to indicate country code as units, which will change the label and sequence in our figure:
 
 ```
-panelview lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) //If we set ylabdist(11), the "155" appears at the bottom of ylabel and is hard to remove, different with R package
+panelview lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3) ylabdist(10)
 ```
 
 <img src="./graph/Graph9.png">
@@ -240,6 +260,18 @@ panelview demo, i(ccode) t(year) type(treat) mycolor(Reds) title("Missing Values
 
 <img src="./graph/Graph13.png">
 
+We can also combine with `leavegap` to plot an vertical white bar if time is not evenly distributed (possibly due to missing data): 
+
+```
+*leavegap
+replace demo=. if year==1960
+replace demo=. if year==1980
+replace lngdp=. if year==1990
+panelview demo lngdp, i(ccode) t(year) type(missing) mycolor(Reds) leavegap ylabel(none)
+```
+
+<img src="./graph/Graph_leavgap2.png">
+
 ### 3.2 Treatment level = 1 & Plotting treatment
 
 If the treatment indicator has only 1 level, then treatment status will not be shown in the `type(treat)` plot, which is the same as `ignoretreat`: 
@@ -247,7 +279,7 @@ If the treatment indicator has only 1 level, then treatment status will not be s
 ```
 use capacity.dta, clear
 gen demo2 = 0
-panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) legend(off) // type(treat) & number of treatment level = 1: same as ignoretreat
+panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(10) legend(off) // type(treat) & number of treatment level = 1: same as ignoretreat
 ```
 
 <img src="./graph/Graph14.png">
@@ -338,7 +370,7 @@ use capacity.dta, clear
 gen demo2 = 0
 replace demo2 = -1 if polity2 < -0.5
 replace demo2 = 1 if polity2 > 0.5
-panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) mycolor(Reds) // type(treat) & number of treatment level = 3
+panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(10) mycolor(Reds) // type(treat) & number of treatment level = 3
 ```
 
 <img src="./graph/Graph16.png">
@@ -351,7 +383,7 @@ gen demo2 = 0
 replace demo2 = -2 if polity2 < -0.7
 replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5
-panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) mycolor(Reds) // number of treatment level = 4
+panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(10) mycolor(Reds) // number of treatment level = 4
 ```
 
 <img src="./graph/Graph18.png">
@@ -368,7 +400,7 @@ replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5 & polity2 < 0.7
 replace demo2 = 2 if polity2 > 0.7
 tab demo2, m 
-panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) continuoustreat
+panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(10) continuoustreat
 ```
 
 <img src="./graph/Graph19.png">
@@ -381,7 +413,7 @@ In the following example, `polity2` ranges from -1 to 1. When `polity2` is in th
 
 ```
 use capacity.dta, clear
-panelview lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
+panelview lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(10) 
 ```
 
 <img src="./graph/Graph20.png">
@@ -391,7 +423,7 @@ If we change the level of the continuous treatment variable, the legend will mod
 ```
 use capacity.dta, clear
 replace polity2 = polity2 + 1
-panelview lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
+panelview lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(10) 
 ```
 
 <img src="./graph/Graph21.png">

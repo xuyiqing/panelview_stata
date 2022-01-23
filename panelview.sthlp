@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1 07Nov2021}{...}
+{* *! version 0.2 23Jan2022}{...}
 {cmd:help panelview}
 {hline}
 
@@ -45,6 +45,7 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 {synopt:{opt byunit}}plots the outcome and treatment variables against time by each unit when {cmd: type(bivariate)} is invoked{p_end}
 {synopt:{opt theme(bw)}}uses the black and white theme (default when specified {cmd:type(bivar)}){p_end}
 {synopt:{opt lwd()}}sets the line width in {cmd:type(bivar)}. Default is {cmd:medium}{p_end}
+{synopt:{opt leavegap}}Keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data){p_end}
 {synopt:{opt *}}Common graph options, such as {cmd:title}, {cmd:ytitle}, {cmd:xtitle}, {cmd:xlabel}, {cmd:ylabel}, and {cmd:legend}, can be applied in {cmd:panelview} as well.
 
 {synoptline}

@@ -23,6 +23,11 @@ panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(tr
 *mycolor(PuBu)
 panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) xtitle("Year") ytitle("State") title("Treatment Status") mycolor(PuBu) bytiming 
 
+*leavegap
+drop if year==1924
+drop if year==1928
+drop if year==1940
+panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) leavegap
 
 
 
@@ -56,6 +61,13 @@ panelview lnpop demo lngdp ccodeid if ccodeid >= 26 & ccodeid <= 51, i(ccode) t(
 /***** 4. Ignoring treatment conditions *****/ 
 use capacity.dta, clear
 panelview demo, i(ccode) t(year) type(treat) mycolor(Reds) title("Missing Values") xlabel(none) ylabel(none) ignoretreat
+
+*leavegap
+replace demo=. if year==1960
+replace demo=. if year==1980
+replace lngdp=. if year==1990
+panelview demo lngdp, i(ccode) t(year) type(missing) mycolor(Reds) leavegap ylabel(none)
+
 
 use capacity.dta, clear
 gen demo2 = 0

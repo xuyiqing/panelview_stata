@@ -25,6 +25,7 @@ program define panelview
 	byunit							///
 	theme(string)					///
 	lwd(string)						///
+	leavegap						///
 	*								///
 	]
 	
@@ -114,11 +115,9 @@ program define panelview
 
 	preserve 
 	tempfile backup
+	
 
 	qui keep `varlist' `i' `t' //only keep using variables, i.e. include covariates
-	marksample touse 
-	cap drop if `touse' == 0 //To include covariates
-
 
 	qui ds `varlist'
 	tempvar numvar
@@ -129,12 +128,17 @@ program define panelview
 		if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing" & "`type'" != "treat") {
 				di as err "should combine with option ignoretreat, type(missing), or type(treat) when varlist has only one variable" 
 				exit 198
+		}
+		else if ("`type'" == "miss" | "`type'" == "missing") {
+			tokenize `varlist'
+			loc outcome `1'
+			loc treat `1'
 		} 
 		else if ("`type'" == "treat") {
 			tokenize `varlist'
 			loc treat `1'
 		}
-		else {
+		else { //"`type'" == "outcome"
 			tokenize `varlist'
 			loc outcome `1'
 		}
@@ -143,6 +147,9 @@ program define panelview
 		if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") {
 			tokenize `varlist'
 			loc outcome `1'
+			loc treat `1'
+			*loc covariates `2' 
+			*drop if mi(`covariates')
 			} 
 			else {
 			tokenize `varlist'
@@ -161,7 +168,28 @@ program define panelview
 			loc treat `2'
 		}
 	}
+
+
+
+	marksample touse 
+
+	if "`leavegap'" == "" { 
+	marksample touse 
+	cap drop if `touse' == 0
+	}
+	else if "`leavegap'" != "" {
+		tempvar countmissvar byunitmissvar maxbyunitmissvar byunittime
+		qui replace `touse'=. if `touse'==0
+		qui egen `countmissvar' = rowmiss(`touse')
+		qui bysort `i': gen `byunitmissvar' = sum(`countmissvar')
+		qui bysort `i': egen `maxbyunitmissvar' = max(`byunitmissvar')
+		qui bysort `i': egen `byunittime' = count(`t')
+		*list `i' `t' `varlist' `touse' `countmissvar' `byunitmissvar' `maxbyunitmissvar' `byunittime'
+		cap drop if `maxbyunitmissvar' == `byunittime'
+	}
 		
+
+
 
 
 	quietly count if `touse'
@@ -185,7 +213,7 @@ program define panelview
 	tempvar nids
 	cap label list `ids' 
 	if "`r(k)'" != "" { //numeric units indicator with labels:
-		egen `nids' = group(`ids') 
+		qui egen `nids' = group(`ids') 
 		*label list `ids'
 	}
 	else{ //numeric units indicator without labels or string variable:
@@ -196,16 +224,16 @@ program define panelview
 		labmask `ids', val(`labelids') 
 		*label list `ids'
 
-		egen `nids' = group(`ids')
+		qui egen `nids' = group(`ids')
 	}
 	else { //string variable:
 		tempvar i_numeric labeli
-		encode `ids',gen(`i_numeric')
+		qui encode `ids',gen(`i_numeric')
 		*label list `i_numeric'
 		drop `ids'
 		rename `i_numeric' `ids'
 	
-		egen `nids' = group(`ids')	
+		qui egen `nids' = group(`ids')	
 	}
 	}
 	
@@ -292,22 +320,117 @@ program define panelview
 	
 	qui levelsof `nids' if `touse' , loc (levsnids) 
 	
+	/*
 	tempvar newtime
 	egen `newtime' = group(`tunit')
-	qui sum `newtime'
-	loc maxmintime = r(max) - r(min)
-	qui levelsof `newtime'
-	loc numsoftime = r(r)
-	loc plotcoef = `maxmintime' / (`numsoftime' -1) 
+	*qui sum `newtime'
+	*loc maxmintime = r(max) - r(min)
+	*qui levelsof `newtime'
+	*loc numsoftime = r(r)
+	*loc plotcoef = `maxmintime' / (`numsoftime' -1) 
 	
+
+	tempvar labeltime
+	qui tostring `tunit', gen(`labeltime')
+	labmask `newtime', val(`labeltime')
+	*/
+
+	tempvar maxtime mintime timegap inttimegap timegap2 mintimegap id_oneobs 
+		cap bysort `nids': gen `maxtime' = `tunit'[_N]
+		qui sum `maxtime'
+		loc maxmaxtime = r(max)
+		cap bysort `nids': egen `mintime' = min(`tunit')
+		qui sum `mintime'
+		loc minmintime = r(min)
+		loc maxmaxminmingap = `maxmaxtime' - `minmintime'
+	
+
+		qui levelsof `tunit'
+		loc numtime = r(r)
+		cap bysort `nids': gen `timegap' = (`maxtime'-`mintime')/(`numtime'-1) //possible common difference
+		*tab `timegap',m
+		qui gen `inttimegap' = int(`timegap')
+		*tab `inttimegap',m
+
+		cap bysort `nids': gen `timegap2' = `tunit'[_n]-`tunit'[_n-1]
+		cap bysort `nids': egen `mintimegap' = min(`timegap2')
+		*tab `mintimegap', m
+
+		if "`leavegap'" != "" {
+		if ( `timegap' != `mintimegap' | `inttimegap' != `timegap') { //not arithmetic sequence
+		tempvar differencetime
+		cap bysort `nids': gen `differencetime' = `tunit'[_n] - `tunit'[_n-1]
+		tab `differencetime', m
+		qui sum `differencetime'
+		loc min_differencetime = r(min)
+		loc max_differencetime = r(max)
+		loc divide_differencetime = `max_differencetime' / `min_differencetime'
+
+		if (`min_differencetime' != `max_differencetime' & `min_differencetime' != 1 & `divide_differencetime' == int(`divide_differencetime')) { // 两两difference相除是整数倍 {
+			qui save `backup', replace
+			qui keep `nids'
+			qui duplicates drop `nids', force
+			qui expand `numtime'
+			cap bysort `nids': gen `tunit' = `minmintime' + (_n-1) * `min_differencetime'
+			tab `tunit',m
+			qui merge 1:1 `nids' `tunit' using `backup'
+			tab _merge, m
+			qui drop _merge
+			tab `tunit',m
+		}
+		else {
+			qui save `backup', replace
+			qui keep `nids'
+			qui duplicates drop `nids', force
+			qui expand `maxmaxminmingap'
+			cap bysort `nids': gen `tunit' = `minmintime' + _n
+			qui merge 1:1 `nids' `tunit' using `backup'
+			qui drop _merge
+			*tab `tunit',m
+		}
+		}
+		}
+	
+
+	loc alltimegap = `maxmaxminmingap'/(`numtime'-1)
+	if `alltimegap' != int(`alltimegap') {
+		di "Time is not evenly distributed (possibly due to missing data). "
+	}
+	else {
+	tempvar tunit_merge
+	qui gen `tunit_merge' = `tunit'
+	qui save `backup', replace
+	qui keep `nids'
+	qui duplicates drop `nids', force
+	qui expand `numtime'
+
+	cap bysort `nids': gen `tunit_merge' = `minmintime' + (_n-1) * `alltimegap'
+	qui merge 1:1 `nids' `tunit_merge' using `backup'
+	tempvar difftime
+	qui gen `difftime' = (`tunit_merge' == `tunit')
+	qui sum `difftime'
+	loc min_difftime = r(min)
+	loc max_difftime = r(max)
+	if  `max_difftime' != `min_difftime' {
+		di "Time is not evenly distributed (possibly due to missing data). "
+	}
+	qui drop `tunit_merge'
+	qui drop _merge
+	}
+
+
+	tempvar newtime
+	qui egen `newtime' = group(`tunit')
+
 	tempvar labeltime
 	qui tostring `tunit', gen(`labeltime')
 	labmask `newtime', val(`labeltime')
 
 
+
+
 	//indicate the last period as a different colored dot in outcome plot if only treated in the last period:
-		tempvar lastchangedot maxtime maxtime2 dtreat islastchangedot
-		cap bysort `nids': gen `maxtime' = `tunit'[_N]
+		tempvar lastchangedot maxtime2 dtreat islastchangedot
 		cap bysort `nids': gen `maxtime2' = `tunit'[_N-1]
 		cap gen `lastchangedot' = 0
 		cap bysort `nids': replace `lastchangedot' = 1 if `treat' == 1 & `tunit' == `maxtime'
@@ -332,26 +455,37 @@ program define panelview
 	}
 */
 
-	tempvar plotvalue 
+	tempvar plotvalue varmiss
+	qui egen `varmiss' = rowmiss(`varlist')
 	if ("`continuoustreat'" != "" & "`type'" == "outcome") {
 		cap gen `plotvalue' = 0
 		}
 		else {
 			if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") { 
-			cap gen `plotvalue' = 0
+				 if "`leavegap'" != "" {
+					cap gen `plotvalue' = 0 if `varmiss' == 0
+				 }
+				 else {
+					cap gen `plotvalue' = 0
+				 }
 			}
 			else { 
 				if ("`type'" == "outcome" & `numlevstreat' > 2) {
 				cap gen `plotvalue' = 0
 				di "The number of treatment level is > 2; the treatment status is therefore ignored."
 				}
-				else {	
-				cap gen `plotvalue' = `treat'
+				else {	//"`type'" == "treat"
+					if "`leavegap'" != "" {
+						cap gen `plotvalue' = `treat' if `varmiss' == 0
+					}
+					else {
+						cap gen `plotvalue' = `treat'
+					}
 				//remapping continuous treatment to 5 levels to fit color palettes levels:
 				if "`continuoustreat'" != "" {
 					qui sum `plotvalue' 
 					loc maxminplotvalue = r(max) - r(min)
-					qui replace `plotvalue' = int((`plotvalue' - r(min)) * 4 / `maxminplotvalue' ) 
+						qui replace `plotvalue' = int((`plotvalue' - r(min)) * 4 / `maxminplotvalue' ) 
 				}
 				}
 			}
@@ -361,9 +495,10 @@ program define panelview
 if ("`type'" == "miss" | "`type'" == "missing") { 
 	if ("`ignoretreat'" == "") {
 		tempvar ignoretreat
-		gen `ignoretreat' = 1	
+		cap gen `ignoretreat' = 1 
 	}
 }
+
 
 	qui levelsof `plotvalue' if `touse', loc (levsplot) 
 	loc numlevsplot = r(r) 
@@ -385,16 +520,15 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		else if `numlevstreat' > 2 {
 			if ("`type'" == "treat") {
 				tempvar altlevsplot
-				egen `altlevsplot' = group(`plotvalue') if `touse' 
+				qui egen `altlevsplot' = group(`plotvalue') if `touse' 
 				cap replace `altlevsplot' =  `altlevsplot' - 1
 				qui levelsof `altlevsplot' if `touse', loc (levsplot)
 				loc numlevsplot = r(r)
-				drop `altlevsplot'
+				qui drop `altlevsplot'
 			}
 		}
 	}
 	}
-
 
 
 
@@ -452,7 +586,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 
 
-	
+
 		if (`"`xlabel'"'=="") {
 			qui sum `newtime', mean
 			local xlabel `"xlabel(`r(min)'(`xlabdist')`r(max)', angle(90) nogrid labsize(tiny) valuelabel noticks)"'
@@ -472,7 +606,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		}
 	
 		tempvar bgplotvalue labplotvalue
-		bysort `nids': egen `bgplotvalue' = min(`plotvalue')
+		qui bysort `nids': egen `bgplotvalue' = min(`plotvalue')
 		*di `levsplot'
 		qui levelsof `bgplotvalue' if `touse', loc (bglevsplot)
 		*di `bglevsplot'
@@ -530,14 +664,14 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 						if ("`bygroup'" != "" ) { //with bygroup:
 						if `islastchangedot' == 0 {
 								tempvar allunits 								
-								egen `allunits' = max(`nids') 
+								qui egen `allunits' = max(`nids') 
 								local largestlegend = 3*`allunits' + 1
 								local midlegend = 2*`allunits'
 								twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 						}
 						else {
 								tempvar allunits 								
-								egen `allunits' = max(`nids') 
+								qui egen `allunits' = max(`nids') 
 								local largestlegend = `allunits' + 2
 								local midlegend = `allunits' + 1
 								twoway `lines1' by(`bgplotvalue', note("") cols(1)) legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
@@ -547,14 +681,14 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 						if (`"`prepost'"' != "") {
 							if `islastchangedot' == 0 {
 								tempvar allunits 								
-								egen `allunits' = max(`nids') 
+								qui egen `allunits' = max(`nids') 
 								local largestlegend = 3*`allunits' + 1
 								local midlegend = 2*`allunits'
 								tw `lines1'  legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 							}
 							else {
 								tempvar allunits 								
-								egen `allunits' = max(`nids') 
+								qui egen `allunits' = max(`nids') 
 								local largestlegend = `allunits' + 2
 								local midlegend = `allunits' + 1
 								tw `lines1'  legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
@@ -563,7 +697,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 							else { //prepost = off:
 								if `islastchangedot' == 0 {
 									tempvar allunits								
-									egen `allunits' = max(`nids') 
+									qui egen `allunits' = max(`nids') 
 									local largestlegend=3*`allunits'
 									tw `lines1' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control"  `largestlegend' "Treated") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 								}
@@ -723,7 +857,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 						loc dismaxminplotvalue = `maxminplotvalue' / 4
 						loc r_max = r(max) + `dismaxminplotvalue'
 						tempvar plotvalue1
-						egen `plotvalue1' = cut(`treat'), at(`r(min)' (`dismaxminplotvalue') `r_max')
+						qui egen `plotvalue1' = cut(`treat'), at(`r(min)' (`dismaxminplotvalue') `r_max')
 						qui levelsof `plotvalue1' if `touse', loc (levsplot1)
 						tokenize `levsplot1'
 						loc contrlev1 `1'
