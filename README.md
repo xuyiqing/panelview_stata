@@ -14,13 +14,13 @@ We develop this package in the belief that it is always a good idea to understan
 
 **Date:** January 23, 2022
 
-**Version:** 0.2 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
+**Version:** 0.1.1 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
 
 **Authors:** Hongyu Mou, Yiqing Xu
 
 **Reference:** Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive.
 
-**Update in v.0.2:** 
+**Update in v.1.1:** 
 
 ​	Add option `leavegap` to keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data).
 
@@ -175,7 +175,7 @@ panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(tr
 
 <img src="./graph/Graph6.png">
 
-if time is not evenly distributed, we can use `leavegap` to keep the time gap as an white bar. Otherwise, we will skip the time gap with an warning "Time is not evenly distributed (possibly due to missing data)."
+If time is not evenly distributed, we can use `leavegap` to keep the time gap as an white bar. Otherwise, we will skip the time gap with an warning "Time is not evenly distributed (possibly due to missing data)."
 
 ```
 *leavegap

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2 23Jan2022}{...}
+{* *! version 0.1 13Nov2021}{...}
 {cmd:help panelview}
 {hline}
 
