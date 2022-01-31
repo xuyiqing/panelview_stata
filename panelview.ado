@@ -103,10 +103,34 @@ program define panelview
 		}
 	}
 
+	if ("`type'" == "outcome" | "`type'" == "bivar") {
+		if ("`leavegap'" != "") {
+			di as err ///
+			"option leavegap should be combined with type(treat) or type(missing)"
+			exit 198
+		}
+	}
+
 	if ("`type'" != "treat") {
 		if ("`ignoreY'" != "") {
 			di as err ///
 			"option ignoreY should be combined with type(treat)"
+			exit 198
+		}
+	}
+
+	if ("`ignoretreat'" != "") {
+		if ("`ignoreY'" != "") {
+			di as err ///
+			"option ignoreY should not be combined with ignoretreat"
+			exit 198
+		}
+	}
+
+	if ("`ignoretreat'" != "") {
+		if ("`type'" == "miss" | "`type'" == "missing") {
+			di as err ///
+			"option type(missing) should not be combined with ignoretreat"
 			exit 198
 		}
 	}
@@ -134,8 +158,8 @@ program define panelview
 
 
 	if `numvar' == 1 {
-		if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing" & "`type'" != "treat") {
-				di as err "should combine with option ignoretreat, type(missing), or type(treat) when varlist has only one variable" 
+		if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing" & "`type'" != "treat" & "`type'" != "outcome") {
+				di as err "should combine with option ignoretreat, type(missing), type(treat) , or type(outcome) when varlist has only one variable" 
 				exit 198
 		}
 		else if ("`type'" == "miss" | "`type'" == "missing") {
@@ -150,6 +174,7 @@ program define panelview
 		else { //"`type'" == "outcome"
 			tokenize `varlist'
 			loc outcome `1'
+			loc ignoretreat 1
 		}
 	}
 	else if  `numvar' == 2 {
@@ -270,10 +295,10 @@ program define panelview
 			cap gen `gcontrol' = 1 
 	}
 	else {
-    if ("`ignoretreat'" != ""|"`type'" == "miss" | "`type'" == "missing") { 
+    		if ("`ignoretreat'" != "" | "`type'" == "miss" | "`type'" == "missing") { 
 			cap gen `gcontrol' = 1 
 			} 
-			else { 
+			else {
 			qui levelsof `treat' if `touse', loc (levstreat)
 			loc numlevstreat = r(r) 
 			
@@ -369,37 +394,30 @@ program define panelview
 		qui levelsof `tunit'
 		loc numtime = r(r)
 		cap bysort `nids': gen `timegap' = (`maxtime'-`mintime')/(`numtime'-1) //possible common difference
-		*tab `timegap',m
 		qui gen `inttimegap' = int(`timegap')
-		*tab `inttimegap',m
 
 		cap bysort `nids': gen `timegap2' = `tunit'[_n]-`tunit'[_n-1]
 		cap bysort `nids': egen `mintimegap' = min(`timegap2')
-		*tab `mintimegap', m
 
 		if "`leavegap'" != "" {
 		if ( `timegap' != `mintimegap' | `inttimegap' != `timegap') { //not arithmetic sequence
 		tempvar differencetime
 		cap bysort `nids': gen `differencetime' = `tunit'[_n] - `tunit'[_n-1]
-		tab `differencetime', m
 		qui sum `differencetime'
 		loc min_differencetime = r(min)
 		loc max_differencetime = r(max)
 		loc divide_differencetime = `max_differencetime' / `min_differencetime'
 
-		if (`min_differencetime' != `max_differencetime' & `min_differencetime' != 1 & `divide_differencetime' == int(`divide_differencetime')) { // 两两difference相除是整数倍 {
+		if (`min_differencetime' != `max_differencetime' & `min_differencetime' != 1 & `divide_differencetime' == int(`divide_differencetime')) { // 两两difference相除是整数倍
 			qui save `backup', replace
 			qui keep `nids'
 			qui duplicates drop `nids', force
 			qui expand `numtime'
 			cap bysort `nids': gen `tunit' = `minmintime' + (_n-1) * `min_differencetime'
-			tab `tunit',m
 			qui merge 1:1 `nids' `tunit' using `backup'
-			tab _merge, m
 			qui drop _merge
-			tab `tunit',m
 		}
-		else {
+		else { //commmon difference = 1 
 			qui save `backup', replace
 			qui keep `nids'
 			qui duplicates drop `nids', force
@@ -407,36 +425,39 @@ program define panelview
 			cap bysort `nids': gen `tunit' = `minmintime' + _n
 			qui merge 1:1 `nids' `tunit' using `backup'
 			qui drop _merge
-			*tab `tunit',m
 		}
 		}
 		}
 	
+	
+	if  "`leavegap'" == "" {
+		loc alltimegap = `maxmaxminmingap'/(`numtime'-1)
+		if (`timegap' != `mintimegap' | `inttimegap' != `timegap') {
+			di "Time is not evenly distributed (possibly due to missing data). "
+		}
+		else {
+			tempvar tunit_merge
+			qui gen `tunit_merge' = `tunit'
+			qui save `backup', replace
+			qui keep `nids'
+			qui duplicates drop `nids', force
+			qui expand `numtime'
 
-	loc alltimegap = `maxmaxminmingap'/(`numtime'-1)
-	if `alltimegap' != int(`alltimegap') {
-		di "Time is not evenly distributed (possibly due to missing data). "
-	}
-	else {
-	tempvar tunit_merge
-	qui gen `tunit_merge' = `tunit'
-	qui save `backup', replace
-	qui keep `nids'
-	qui duplicates drop `nids', force
-	qui expand `numtime'
-
-	cap bysort `nids': gen `tunit_merge' = `minmintime' + (_n-1) * `alltimegap'
-	qui merge 1:1 `nids' `tunit_merge' using `backup'
-	tempvar difftime
-	qui gen `difftime' = (`tunit_merge' == `tunit')
-	qui sum `difftime'
-	loc min_difftime = r(min)
-	loc max_difftime = r(max)
-	if  `max_difftime' != `min_difftime' {
-		di "Time is not evenly distributed (possibly due to missing data). "
-	}
-	qui drop `tunit_merge'
-	qui drop _merge
+			cap bysort `nids': gen `tunit_merge' = `minmintime' + (_n-1) * `alltimegap'
+			qui merge 1:1 `nids' `tunit_merge' using `backup'
+			tempvar difftime
+			qui gen `difftime' = (`tunit_merge' == `tunit')
+			qui sum `difftime'
+			loc min_difftime = r(min)
+			loc max_difftime = r(max)
+			*if  (`max_difftime' != `min_difftime') { 
+				*if (`alltimegap' != 1) {
+				*di "Time is not evenly distributed (possibly due to missing data). "
+				*}
+			*}
+			qui drop `tunit_merge'
+			qui drop _merge
+		}
 	}
 
 
@@ -460,7 +481,6 @@ program define panelview
 
 		cap count if `lastchangedot' == 1
 		loc islastchangedot = (r(N) != 0)
-		*di `islastchangedot'
 
 
 /*
@@ -628,13 +648,10 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 	
 		tempvar bgplotvalue labplotvalue
 		qui bysort `nids': egen `bgplotvalue' = min(`plotvalue')
-		*di `levsplot'
 		qui levelsof `bgplotvalue' if `touse', loc (bglevsplot)
-		*di `bglevsplot'
 
 		label define `labplotvalue' 0 "Always Under Control" 1 "Treatment Status Changed" 2 "Always Treated"
 		label val `bgplotvalue' `labplotvalue'
-		*tab `nids' if `bgplotvalue'==2, m
 
 
 
@@ -670,7 +687,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		}
 		
 		
-		if ("`continuoustreat'" != "") {
+			if ("`continuoustreat'" != "") {
 			tw `lines1' legend(region(lstyle(none) fcolor(none)) order(1) label(1 "Observed") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 			}
 			else { // not continuoustreat:

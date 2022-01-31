@@ -12,7 +12,7 @@ We develop this package in the belief that it is always a good idea to understan
 
 ------
 
-**Date:** January 23, 2022
+**Date:** January 28, 2022
 
 **Version:** 0.1.1 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
 
@@ -65,6 +65,17 @@ net install panelview, all replace from("https://yiqingxu.org/packages/panelview
 ------
 
 ## 1. Syntax
+
+| case | formula   | option            | type      | funcitonality                                                |
+| :--: | :-------- | ----------------- | --------- | ------------------------------------------------------------ |
+|  1   | Y D X1 X2 |                   | missing   | show missingness in Y, D, X1, or X2.                         |
+|  2   | Y         |                   | missing   | show missingness in Y.                                       |
+|  3   | Y D X1 X2 |                   | treat     | show treatment status of D, conditional on no-missing-data in  Y, D, X1 and X2. |
+|  4   | D X1 X2   | ignoreY           | treat     | show treatment status of D, conditional on no-missing-data in  D, X1 and X2. |
+|  5   | D         | ignoreY (default) | treat     | show treatment status of D.                                  |
+|  6   | Y D X1 X2 |                   | outcome   | show time-series of Y, colored in D, conditional on  no-missing-data in Y, D, X1, and X2. |
+|  7   | Y         |                   | outcome   | show time-series of Y.                                       |
+|  8   | Y D X1 X2 |                   | bivariate | show relationship of Y and D, conditional on no-missing-data  in Y, D, X1, and X2. |
 
 The general syntax of the package can be summarized as:
 
