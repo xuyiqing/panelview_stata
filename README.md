@@ -66,16 +66,18 @@ net install panelview, all replace from("https://yiqingxu.org/packages/panelview
 
 ## 1. Syntax
 
-| case | formula   | option            | type      | funcitonality                                                |
-| :--: | :-------- | ----------------- | --------- | ------------------------------------------------------------ |
-|  1   | Y D X1 X2 |                   | missing   | show missingness in Y, D, X1, or X2.                         |
-|  2   | Y         |                   | missing   | show missingness in Y.                                       |
-|  3   | Y D X1 X2 |                   | treat     | show treatment status of D, conditional on no-missing-data in  Y, D, X1 and X2. |
-|  4   | D X1 X2   | ignoreY           | treat     | show treatment status of D, conditional on no-missing-data in  D, X1 and X2. |
-|  5   | D         | ignoreY (default) | treat     | show treatment status of D.                                  |
-|  6   | Y D X1 X2 |                   | outcome   | show time-series of Y, colored in D, conditional on  no-missing-data in Y, D, X1, and X2. |
-|  7   | Y         |                   | outcome   | show time-series of Y.                                       |
-|  8   | Y D X1 X2 |                   | bivariate | show relationship of Y and D, conditional on no-missing-data  in Y, D, X1, and X2. |
+An overview of the syntax is below. Note that *Y*, *D*, and *X* in the table are merely labels; they can be any variables in a panel dataset.
+
+| Sata.formula | Option              | Type        | Function                                                     |
+| :----------- | :------------------ | ----------- | ------------------------------------------------------------ |
+| Y D X        |                     | `missing`   | show missingness in Y, D, or X.                              |
+| Y            |                     | `missing`   | show missingness in Y.                                       |
+| Y D X        |                     | `treat`     | show treatment status of D given complete data in  Y, D, and X. |
+| D X          | `ignoreY`           | `treat`     | show treatment status of D given complete data in  D and X.  |
+| D            | `ignoreY` (default) | `treat`     | show treatment status of D.                                  |
+| Y D X        |                     | `outcome`   | show time-series of Y colored in D given complete data in Y, D, and X. |
+| Y            |                     | `outcome`   | show time-series of Y.                                       |
+| Y D X        |                     | `bivariate` | show relationship of Y and D given complete data in Y, D, and X. |
 
 The general syntax of the package can be summarized as:
 
@@ -124,7 +126,7 @@ where the subcommand can be:
 | `byunit`                  | Plot the outcome and treatment variables against time by each unit when `type(bivar)` is invoked. |
 | `theme(bw)`               | Use the black and white theme (default when specified `type(bivar)`). |
 | `lwd()`             | Set the line width in `type(bivar)`  (default is `medium`).  |
-| `leavegap` | Keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data). |
+| `leavegap` | Keep the time gap as a white bar if time is not evenly distributed (possibly due to missing data). |
 
 ------
 
