@@ -219,19 +219,15 @@ program define panelview
 
 	marksample touse 
 
-	if "`leavegap'" == "" { 
-	marksample touse 
+	if "`leavegap'" == "" {
 	cap drop if `touse' == 0
 	}
 	else if "`leavegap'" != "" {
-		tempvar countmissvar byunitmissvar maxbyunitmissvar byunittime
-		qui replace `touse'=. if `touse'==0
+		tempvar countmissvar minrowmiss
+		qui replace `touse' = . if `touse' == 0
 		qui egen `countmissvar' = rowmiss(`touse')
-		qui bysort `i': gen `byunitmissvar' = sum(`countmissvar')
-		qui bysort `i': egen `maxbyunitmissvar' = max(`byunitmissvar')
-		qui bysort `i': egen `byunittime' = count(`t')
-		*list `i' `t' `varlist' `touse' `countmissvar' `byunitmissvar' `maxbyunitmissvar' `byunittime'
-		cap drop if `maxbyunitmissvar' == `byunittime'
+		qui bysort `i': egen `minrowmiss' = min(`countmissvar')
+		cap drop if `minrowmiss' != 0
 	}
 		
 
