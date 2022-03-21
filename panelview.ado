@@ -111,10 +111,10 @@ program define panelview
 		}
 	}
 
-	if ("`type'" != "treat") {
+	if ("`type'" != "treat" & "`type'" != "miss" & "`type'" != "missing") {
 		if ("`ignoreY'" != "") {
 			di as err ///
-			"option ignoreY should be combined with type(treat)"
+			"option ignoreY should be combined with type(treat) or type(missing)"
 			exit 198
 		}
 	}
@@ -287,17 +287,25 @@ program define panelview
 
 	// ignore treatment:
 	tempvar gcontrol
-	if ("`continuoustreat'" != "" & "`type'" == "outcome") { 
+
+	capture confirm variable `treat'
+	if !_rc {
+	qui levelsof `treat' if `touse', loc (levstreat)
+	loc numlevstreat = r(r) 
+	}
+
+	if ("`ignoretreat'" != "" | "`type'" == "miss" | "`type'" == "missing") { 
+			cap gen `gcontrol' = 1 
+		}
+	*if ("`continuoustreat'" != "" & "`type'" == "outcome") { 
+	else if (`numlevstreat' > 2 & "`type'" == "outcome") { 
 			cap gen `gcontrol' = 1 
 	}
 	else {
-    		if ("`ignoretreat'" != "" | "`type'" == "miss" | "`type'" == "missing") { 
-			cap gen `gcontrol' = 1 
-			} 
-			else {
-			qui levelsof `treat' if `touse', loc (levstreat)
-			loc numlevstreat = r(r) 
-			
+    		*if ("`ignoretreat'" != "" | "`type'" == "miss" | "`type'" == "missing") { 
+			*cap gen `gcontrol' = 1 
+			*} 
+			else {			
 			if (`numlevstreat' == 2) {
 			tempvar max_treat
 			cap bys `nids': egen `max_treat' = max(`treat') 
@@ -315,20 +323,19 @@ program define panelview
 					exit 198
 					}
 					else {
-						if (`numlevstreat' >= 5) {
-						if ( "`continuoustreat'" == "") {
-							di as err " If the number of treatment levels >= 5, need to combine with option continuoustreat"
-							exit 198
-						}
-						}
-						else {
+						if (`numlevstreat' >= 5 & "`continuoustreat'" == "") {
+							di "Too many treatment levels; treat as continuous."
+							local continuoustreat `"continuoustreat"'
 							cap gen `gcontrol' = 1
+						}
+						if (`numlevstreat' <= 4 & "`continuoustreat'" != "") { 
+							di "Too few treatment levels; consider drop the continuoustreat option."
 						}
 					}
 				}
 			}
 			}
-			}	
+		}	
 
 	sort `ids' `tunit' 
 
@@ -494,6 +501,7 @@ program define panelview
 
 	tempvar plotvalue varmiss
 	qui egen `varmiss' = rowmiss(`varlist')
+
 	if ("`continuoustreat'" != "" & "`type'" == "outcome") {
 		cap gen `plotvalue' = 0
 		}
@@ -509,7 +517,7 @@ program define panelview
 			else { 
 				if ("`type'" == "outcome" & `numlevstreat' > 2) {
 				cap gen `plotvalue' = 0
-				di "The number of treatment level is > 2; the treatment status is therefore ignored."
+				di "The number of treatment level is > 2; we ignore the treatment status."
 				}
 				else {	//"`type'" == "treat"
 					if "`leavegap'" != "" {
@@ -682,7 +690,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 			}
 		}
 		
-		
+
 			if ("`continuoustreat'" != "") {
 			tw `lines1' legend(region(lstyle(none) fcolor(none)) order(1) label(1 "Observed") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) `options'
 			}
@@ -905,10 +913,10 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 						loc contrlev44=round(`4', 0.001)
 						loc contrlev55=round(`5', 0.001)
 						if `contrlev55' > `contrlev44' {
-							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4 5) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") label(5 "`contrlev55'") title("Treatment Levels: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
+							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4 5) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") label(5 "`contrlev55'") title("Treatment levels: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 						}
 						else {
-							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") title("Treatment Levels: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
+							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") title("Treatment level: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 						}
 						}
 						else {
@@ -919,10 +927,10 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 								loc trlev3 `3'
 								loc trlev4 `4' // If the number of treatment levels >= 5, need to combine with Continuoustreat
 								if "`trlev4'" != ""{ //treatment levels = 4:
-								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(2) order(1 2 3 4) label(1 "Treatment Level: `trlev1'") label(2 "Treatment Level: `trlev2'") label(3 "Treatment Level: `trlev3'") label(4 "Treatment Level: `trlev4'") size(*0.55) symxsize(3) keygap(0.5) colgap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
+								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(2) order(1 2 3 4) label(1 "Treatment level: `trlev1'") label(2 "Treatment level: `trlev2'") label(3 "Treatment level: `trlev3'") label(4 "Treatment level: `trlev4'") size(*0.55) symxsize(3) keygap(0.5) colgap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 								}
 								else { //treatment levels = 3:
-								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Treatment Level: `trlev1'") label(2 "Treatment Level: `trlev2'") label(3 "Treatment Level: `trlev3'") size(*0.55) symxsize(3) keygap(0.5) colgap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
+								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Treatment level: `trlev1'") label(2 "Treatment level: `trlev2'") label(3 "Treatment level: `trlev3'") size(*0.55) symxsize(3) keygap(0.5) colgap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("`ids'") `ylabel' `xlabel' "'
 								}
 							}
 							else { //treatment levels = 2:

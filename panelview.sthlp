@@ -36,7 +36,7 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 {synopt:{opt bytiming}}sorts units by when they first receive the treatment; if the timing is the same, then by the total number of periods exposed to the treatment{p_end}
 {synopt:{opt ignoretreat}}omits the treatment indicator, that is, any variables after {cmd: Y} will be interpreted as covariates; useful in a {cmd:type(outcome)} plot{p_end}
 {synopt:{opt ignoreY}}shows treatment status of the first variable in the varlist instead of the second (e.g., D in formula is D X, instead of X).
-It needs to be combined with {cmd:type(treat)}. If there is only one variable in the varlist, the option is turned on by default{p_end}
+It needs to be combined with {cmd:type(treat)} or {cmd:type(missing)}. If there is only one variable in the varlist, the option is turned on by default{p_end}
 {synopt:{opt mycol:or(string)}}changes the color schemes; click {it:{help colorpalette:here}} for sequential colors (3-9 colors){p_end}
 {synopt:{opt pre:post}}distinguishes the pre- and post-treatment periods for treated units{p_end}
 {synopt:{opt xlabdist(integer)}}changes the gap between labels on the x-axis; default is {cmd: 1}{p_end}
@@ -60,11 +60,11 @@ It needs to be combined with {cmd:type(treat)}. If there is only one variable in
 {pstd}
 {opt panelview} has three main functionalities: {p_end}
 {pstd}
-(1) it visualizes the treatment and missing-value statuses of each observation in a panel dataset; {p_end}
+(1) it plots the treatment status and missing values in a panel dataset; {p_end}
 {pstd}
-(2) it plots the outcome variable (either continuous or discrete) in a time-series fashion; {p_end}
+(2) it visualizes variables of interest in a time-series fashion;  {p_end}
 {pstd}
-(3) it visualizes the relationships between the outcome and treatment variable individually or in an aggregate fashion. {p_end}
+(3) it depicts the bivariate relationships between a treatment variable and an outcome variable either by unit or in aggregate. {p_end}
 {pstd}
 
 {title:Examples}

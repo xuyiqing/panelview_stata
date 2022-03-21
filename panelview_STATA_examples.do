@@ -104,19 +104,19 @@ replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5 & polity2 < 0.7
 replace demo2 = 2 if polity2 > 0.7
 tab demo2, m 
-panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) continuoustreat // numlevstreat >= 5
+panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(11) // numlevstreat >= 5
 
 
 
 /***** 6. Continuous treatment *****/
 use capacity.dta, clear
 tab polity2, m
-panelview lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
+panelview lngdp polity2, i(ccode) t(year) type(treat) mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
 
 use capacity.dta, clear
 tab polity2, m
 replace polity2 = polity2 + 1
-panelview lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
+panelview lngdp polity2, i(ccode) t(year) type(treat) mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
 
 
 /***** 7. Continuous Outcomes *****/
@@ -166,8 +166,8 @@ panelview Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteout
 /***** 10. Type(outcome) & continuoustreat / > 2 treatment levels *****/
 
 use capacity.dta, clear 
-* Continuous Outcome: Capacity; Continuoustreat: polity2
-panelview Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring State Capacity") legend(off) theme(bw)
+* Continuous Outcome: Capacity; Continuous Treatment: polity2
+panelview Capacity polity2 lngdp, i(ccode) t(year) type(outcome) title("Measuring State Capacity") legend(off) theme(bw)
 
 use capacity.dta, clear 
 panelview Capacity demo lngdp, i(ccode) t(year) type(outcome) title("Measuring State Capacity") ignoretreat
@@ -193,7 +193,7 @@ panelview Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title
 
 use simdata.dta, replace
 range x 0 1
-panelview Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") continuoustreat theme(bw) // continuoustreat
+panelview Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") theme(bw)
 
 
 
@@ -214,12 +214,12 @@ panelview Y D,i(id) t(time) discreteoutcome xlabdist(4) type(bivar) mycolor(Reds
 
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelview lnpop polity2, i(country) t(year) continuoustreat xlabdist(20) type(bivar)
+panelview lnpop polity2, i(country) t(year) xlabdist(20) type(bivar)
 
 /***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelview Y x, i(id) t(time) continuoustreat discreteoutcome xlabdist(4) type(bivar) style(b c)
+panelview Y x, i(id) t(time) discreteoutcome xlabdist(4) type(bivar) style(b c)
 
 
 /***** Line the discete treatment *****/
@@ -251,12 +251,12 @@ panelview Y D if id >= 101 & id <= 120,i(id) t(time) discreteoutcome xlabdist(4)
 
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelview lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat xlabdist(20) type(bivar) byunit
+panelview lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) xlabdist(20) type(bivar) byunit
 
 /***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelview Y x if id >= 101 & id <= 112, i(id) t(time) continuoustreat discreteoutcome xlabdist(4) type(bivar) byunit
+panelview Y x if id >= 101 & id <= 112, i(id) t(time) discreteoutcome xlabdist(4) type(bivar) byunit
 
 
 

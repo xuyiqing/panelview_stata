@@ -2,13 +2,13 @@
 
 The **`panelview`** package has three main functionalities:
 
-(1) it visualizes the treatment and missing-value statuses of each observation in a panel dataset;
+(1) it plots the treatment status and missing values in a panel dataset;
 
-(2) it plots the outcome variable (either continuous or discrete) in a time-series fashion;
+ (2) it visualizes variables of interest in a time-series fashion; 
 
-(3) it visualizes the relationships between the outcome and treatment variable individually or in an aggregate fashion.
+(3) it depicts the bivariate relationships between a treatment variable and an outcome variable either by unit or in aggregate.
 
-We develop this package in the belief that it is always a good idea to understand your raw data better before conducting statistical analyses.
+These tools can help researchers better understand their panel data before conducting statistical analysis.
 
 ------
 
@@ -39,7 +39,7 @@ __Table of Contents__
 
 ## 0. Installation
 
-Firstly, we need to install 4 dependencies, including `grc1leg`, ` gr0075`, `labutil`, and `sencode`. Type the following commands in your Stata console:
+Firstly, users need to install several dependencies: `grc1leg`, ` gr0075`, `labutil`, and `sencode`.
 
 ```
 net install grc1leg, from(http://www.stata.com/users/vwiggins) replace
@@ -48,14 +48,14 @@ ssc install labutil, replace
 ssc install sencode, replace
 ```
 
-To install the `panelview` package with Stata version 15.1 or greater, one way is through `ssc install`: 
+Then to install the `panelview` package with Stata version 15.1 or greater, one way is by typing `ssc install`: 
 
 ```
 cd "your_full_local_path_to_ado_folder"
 ssc install panelview, all
 ```
 
-Another way is through `net install` to install the latest version of `panelview`: 
+Another way is using `net install` to install the up-to-date version of `panelview`: 
 
 ```
 cap ado uninstall panelview //in-case already installed
@@ -66,7 +66,7 @@ net install panelview, all replace from("https://yiqingxu.org/packages/panelview
 
 ## 1. Syntax
 
-An overview of the syntax is below. Note that *Y*, *D*, and *X* in the table are merely labels; they can be any variables in a panel dataset.
+An overview of the syntax is below. Note that *Y*, *D*, and *X* in the table are simply labels; they can represent any variable in a panel dataset.
 
 | Sata.formula | Option              | Type        | Function                                                     |
 | :----------- | :------------------ | ----------- | ------------------------------------------------------------ |
@@ -113,11 +113,11 @@ where the subcommand can be:
 | `if` and `in`             | We recommend users to add variable that is not included in the `varlist` or `i()` / `t()` but appears in the `if`/ `in` subcommand to the  `varlist` following `panelview` command. |
 | `i()` and `t()`        | Specify the unit (group) and time indicators.                |
 | `type()`               | Use `type(treat)` to plot treatment assignment using a heatmap. Use `type(outcome)` to plot an outcome variable---or any variable---in a time series fashion. Use `type(bivar)` or `type(bivariate)` to plot the outcome and treatment variables against time in the same graph. Use `type(miss)` or `type(missing)` to plot the missing data status of a variable. |
-| `continuoustreat` | The treatment variable is presented as a continuous variable |
+| `continuoustreat` | The treatment variable is presented as a continuous variable. |
 | `discreteoutcome`         | When a variable is discrete, make sure `panelview` respects its discreteness in `type(outcome)` plots. |
 | `bytiming`                | Sort units by the timing of first receiving the treatment; if the timing is the same, then by the total number of periods exposed to the treatment. |
 | `ignoretreat` | Omit the treatment indicator, that is, any variables after `Y` will be interpreted as covariates. |
-| `ignoreY` | Show treatment status of the first variable in the varlist instead of the second (e.g., D in formula is D X, instead of X). It needs to be combined with `type(treat)` . If there is only one variable in the varlist, the option is turned on by default. |
+| `ignoreY` | Show treatment status of the first variable in the varlist instead of the second (e.g., D in formula is D X, instead of X). It needs to be combined with `type(treat)` or `type(missing)` . If there is only one variable in the varlist, the option is turned on by default. |
 | `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). |
 | `PREpost`            | Distinguish the pre- and post-treatment periods for treated units. |
 | `xlabdist()` and `ylabdist()` | Change integer gaps between labels on the x- and y-axes. Default is 1. |
@@ -132,7 +132,7 @@ where the subcommand can be:
 
 ## 2. Plotting Treatment Conditions
 
-First, we show how to visualize the dichotomous treatment conditions in a panel dataset. The treatment may  switch on and off or have missing values.
+First, we show how to visualize the dichotomous treatment in a panel dataset. The treatment may  switch on and off or have missing values.
 
 ### 2.1 Two treatment conditions
 
@@ -147,7 +147,7 @@ panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(tr
 
 <img src="./graph/Graph1.png">
 
-We can use the `bytiming` option to sort units by the timing of first receiving the treatment and use `legend` to change labels in the legend: 
+We can use the `bytiming` option to sort units by the timing of receiving the treatment (then by the total number of periods exposed to the treatment). We also use `legend` to change labels in the legend: 
 
 ```
 *bytiming
@@ -323,7 +323,7 @@ panelview Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Regime Typ
 
 ### 3.4 Plotting outcome & Continuous treatment / More than two treatment levels
 
-If the treatment indicator has more than 2 treatment levels or is a continuous variable, then treatment status will not be shown on the `type(outcome)` plot. In other words, `type(outcome)` combined with `continuoustreat` or > 2 treatment levels is the same as  `ignoretreat`.
+If the treatment indicator has more than 2 treatment levels or is a continuous variable, then treatment status will not be shown in the `type(outcome)` plot. In other words, `type(outcome)` combined with `continuoustreat` or > 2 treatment levels is the same as  `ignoretreat`.
 
 #### 3.4.1 Continuous outcomes
 
@@ -331,8 +331,8 @@ With a continuous treatment variable (e.g. `polity2`), the treatment status will
 
 ```
 use capacity.dta, clear 
-* Continuous Outcome: Capacity; Continuoustreat: polity2
-panelview Capacity polity2 lngdp, i(ccode) t(year) type(outcome) continuoustreat title("Measuring State Capacity") legend(off) theme(bw)
+* Continuous Outcome: Capacity; Continuous Treatment: polity2
+panelview Capacity polity2 lngdp, i(ccode) t(year) type(outcome) title("Measuring State Capacity") legend(off) theme(bw)
 ```
 
 <img src="./graph/Graph31.png">
@@ -379,7 +379,7 @@ panelview Y D, type(outcome) i(id) t(time) mycolor(Greens) discreteoutcome title
 ```
 use simdata.dta, replace
 range x 0 1
-panelview Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") continuoustreat theme(bw) // continuous treatment & black and white theme
+panelview Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") theme(bw) // continuous treatment & black and white theme
 ```
 
 ------
@@ -425,20 +425,20 @@ replace demo2 = -1 if polity2 < -0.5 & polity2 > -0.7
 replace demo2 = 1 if polity2 > 0.5 & polity2 < 0.7
 replace demo2 = 2 if polity2 > 0.7
 tab demo2, m 
-panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(10) continuoustreat
+panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type") xlabdist(3) ylabdist(10)
 ```
 
 <img src="./graph/Graph19.png">
 
 ### 4.4 Continuous treatment
 
-Plot the continuous treatment variable by `continuoustreat`. We convert the continuous treatment variable into five groups according to its treatment levels. 
+To plot the continuous treatment variable, we convert the continuous treatment variable into five groups according to its treatment levels. 
 
 In the following example, `polity2` ranges from -1 to 1. When `polity2` is in the lowest category (-1), it ranges from -1 to (but not including) -0.5. When `polity2` is in the -0.5 category, it ranges from -0.5 to (but not including) 0. When `polity2` is in the 0 category, it ranges from 0 to (but not including) 0.5. When `polity2` is in the 0.5 category, it ranges from 0.5 to (but not including) 1. When `polity2` is in the 1 category, it indicates observations when `polity2` is equal to 1.
 
 ```
 use capacity.dta, clear
-panelview lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(10) 
+panelview lngdp polity2, i(ccode) t(year) type(treat) mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(10) 
 ```
 
 <img src="./graph/Graph20.png">
@@ -448,7 +448,7 @@ If we change the level of the continuous treatment variable, the legend will mod
 ```
 use capacity.dta, clear
 replace polity2 = polity2 + 1
-panelview lngdp polity2, i(ccode) t(year) type(treat) continuoustreat mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(10) 
+panelview lngdp polity2, i(ccode) t(year) type(treat) mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(10) 
 ```
 
 <img src="./graph/Graph21.png">
@@ -590,23 +590,23 @@ panelview Y D,i(id) t(time) discreteoutcome xlabdist(4) type(bivar) mycolor(Reds
 
 <img src="./graph/Graph46.png">
 
-When treatment variable is continuous, we need to add the subcommands of `continuoustreat`: 
+When treatment variable is continuous:  
 
 ```
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelview lnpop polity2, i(country) t(year) continuoustreat xlabdist(20) type(bivar)
+panelview lnpop polity2, i(country) t(year) xlabdist(20) type(bivar)
 ```
 
 <img src="./graph/Graph47.png">
 
-In the last situation, we plot discrete outcome and continuous treatment with options `continuoustreat` and `discreteoutcome`:
+In the last situation, we plot discrete outcome and continuous treatment: 
 
 ```
 /***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelview Y x, i(id) t(time) continuoustreat discreteoutcome xlabdist(4) type(bivar) style(b c)
+panelview Y x, i(id) t(time) discreteoutcome xlabdist(4) type(bivar) style(b c)
 ```
 
 <img src="./graph/Graph48.png">
@@ -666,7 +666,7 @@ With continuous outcome and treatment:
 ```
 /***** 3. Y: continuous; D: continuous *****/
 use capacity.dta, clear 
-panelview lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) continuoustreat xlabdist(20) type(bivar) byunit
+panelview lnpop polity2 if country >= 1 & country <= 12, i(country) t(year) xlabdist(20) type(bivar) byunit
 ```
 
 <img src="./graph/Graph40.png">
@@ -677,7 +677,7 @@ With discrete outcome and continuous treatment:
 /***** 4. Y: discrete; D: continuous *****/
 use simdata.dta, replace
 range x 0 1
-panelview Y x if id >= 101 & id <= 112, i(id) t(time) continuoustreat discreteoutcome xlabdist(4) type(bivar) byunit
+panelview Y x if id >= 101 & id <= 112, i(id) t(time) discreteoutcome xlabdist(4) type(bivar) byunit
 ```
 
 <img src="./graph/Graph41.png">
