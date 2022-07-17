@@ -12,20 +12,20 @@ These tools can help researchers better understand their panel data before condu
 
 ------
 
-**Date:** January 28, 2022
+**Date:** July 17, 2022
 
-**Version:** 0.1.1 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
+**Version:** 0.1.2 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
 
 **Authors:** Hongyu Mou, Yiqing Xu
 
 **Reference:** Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive.
 
-**Update in v.0.1.1:** 
+**Update in v.0.1.2:** 
 
-1. Add option `leavegap` to keep the time gap as an white bar if time is not evenly distributed (possibly due to missing data).
-1. Add option `ignoreY` to show treatment status of the first variable in the varlist instead of the second (e.g., D in formula is D X, instead of X). It needs to be combined with `type(treat)`. If there is only one variable in the varlist, the option is turned on by default.
+1. Add option `bygroupside` to arrange subfigures of `bygroup` in a row rather than in a column.
+1. Add option `displayall` to show all units if the number of units is more than 500, otherwise we randomly select 500 units to present.
 
-Please report bugs to  hongyumou5@gmail.com or yiqingxu@stanford.edu.
+Please report bugs to  hongyumou@g.ucla.edu or yiqingxu@stanford.edu.
 
 We thank Yifan Huang for an early version of the program and Ziyi Liu for helpful suggestions.
 
@@ -101,6 +101,8 @@ panelview Y D X [if] [in], 			      ///
 	theme(string)						   					///
 	lwd(string)							   					///
 	leavegap														///
+	bygroupside   											///
+  displayall													///
 	*									   								///
 	]
 ```
@@ -121,12 +123,14 @@ where the subcommand can be:
 | `MYCOLor()`               | Change the color schemes; click [here](http://repec.sowi.unibe.ch/stata/palettes/help-colorpalette.html) for sequential colors (3-9 colors). |
 | `PREpost`            | Distinguish the pre- and post-treatment periods for treated units. |
 | `xlabdist()` and `ylabdist()` | Change integer gaps between labels on the x- and y-axes. Default is 1. |
-| `bygroup`            | Put each unit into different treatment groups, then plot them separately when `type(outcome)` is invoked. |
+| `bygroup`            | Put each unit into different treatment groups, then plot them separately in a column when `type(outcome)` is invoked. |
 | `style()`        | Determine the style of the elements in a plot.  The first and second entries define the style of the outcome and treatment, respectively. `connected` or `c` for connected lines, `line` or `l` for lines, `bar` or `b` for bars. |
 | `byunit`                  | Plot the outcome and treatment variables against time by each unit when `type(bivar)` is invoked. |
 | `theme(bw)`               | Use the black and white theme (default when specified `type(bivar)`). |
 | `lwd()`             | Set the line width in `type(bivar)`  (default is `medium`).  |
 | `leavegap` | Keep the time gap as a white bar if time is not evenly distributed (possibly due to missing data). |
+| `bygroupside` | Arrange subfigures of `bygroup` in a row rather than in a column. |
+| `displayall` | Show all units if the number of units is more than 500, otherwise we randomly select 500 units to present. |
 
 ------
 
@@ -502,14 +506,23 @@ panelview turnout policy_edr policy_mail_in policy_motor if abb == 1|abb == 2|ab
 
 ### 5.3 Put each unit into different groups, then plot respectively
 
-To better understand the data, sometimes we want to plot the outcome based on whether the treatment status has changed during the observed time period. We can simply add options `prepost` and `bygroup`. The algorithm will analyze the data and automatically put each unit into different groups, e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed.
+To better understand the data, sometimes we want to plot the outcome based on whether the treatment status has changed during the observed time period. We can simply add options  `bygroup`. The algorithm will analyze the data and automatically put each unit into different groups, e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed.
 
 ```
 use turnout.dta, clear
-panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup prepost xlabel(1920 (20) 2000) 
+panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup xlabel(1920 (20) 2000) 
 ```
 
 <img src="./graph/Graph26.png">
+
+If we want to arrange the subfigures in a row rather than in a column,  use the `bygroupside` option instead of `bygroup`.
+
+```
+use turnout.dta, clear
+panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroupside xlabel(1920 (20) 2000) 
+```
+
+<img src="./graph/Graph26_1.png">
 
 ------
 
@@ -532,7 +545,7 @@ We split the sample based on changes in treatment status:
 
 ```
 use simdata.dta, replace
-panelview Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup prepost
+panelview Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup
 ```
 
 <img src="./graph/Graph30.png">

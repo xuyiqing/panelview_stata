@@ -1,10 +1,11 @@
 /*
-Version 0.1.1
-Jan 23 2022
+Version 0.1.2
+July 17 2022
 Hongyu Mou
 */
 
 clear
+
 
 /***** 1. D: dummy; type(treat) *****/
 use turnout.dta, clear 
@@ -78,6 +79,8 @@ panelview Capacity demo2 lngdp, i(ccode) t(year) type(treat) title("Regime Type"
 
 panelview Capacity demo2 lngdp, i(ccode) t(year) type(outcome) title("Regime Type") legend(off) // type(outcome) & numlevstreat = 1
 
+
+
 /* 5. More than Two Treatment Conditions: still discrete treatment */
 use capacity.dta, clear
 gen demo2 = 0
@@ -119,6 +122,7 @@ replace polity2 = polity2 + 1
 panelview lngdp polity2, i(ccode) t(year) type(treat) mycolor(Reds) title("Regime Type") xlabdist(3) ylabdist(11) 
 
 
+
 /***** 7. Continuous Outcomes *****/
 *Note: paint the period right before treatment
 
@@ -137,7 +141,10 @@ panelview turnout policy_edr policy_mail_in policy_motor if abb == 1|abb == 2|ab
 
 *Put each unit into different groups, then plot respectively, e.g. (1) always treated, (2) always in control, (3) treatment status changed.
 use turnout.dta, clear
-panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup prepost xlabel(1920 (20) 2000)
+panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroup xlabel(1920 (20) 2000)
+
+*bygroupside
+panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroupside xlabel(1920 (20) 2000)
 
 
 
@@ -159,7 +166,7 @@ panelview Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteout
 
 *Put each unit into different groups, then plot respectively:
 use simdata.dta, replace
-panelview Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup prepost
+panelview Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteoutcome by(,title("Raw Data")) xlabel(8 (2) 15) ylabel(0 (1) 2) bygroup
 
 
 
@@ -197,8 +204,6 @@ panelview Y x, type(outcome) i(id) t(time) discreteoutcome title("Raw Data") the
 
 
 
-
-
 /***** 11. Plot mean D and Y against time in the same graph *****/
 /***** 1. Y: continuous; D: discrete *****/
 use turnout.dta, clear
@@ -230,8 +235,6 @@ panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) xlabdis
 *Y: Discrete; D: discrete
 use simdata.dta, replace
 panelview Y D,i(id) t(time) discreteoutcome xlabdist(4) style(line) type(bivar)
-
-
 
 
 

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1 13Nov2021}{...}
+{* *! version 0.1.2 17July2022}{...}
 {cmd:help panelview}
 {hline}
 
@@ -41,13 +41,15 @@ It needs to be combined with {cmd:type(treat)} or {cmd:type(missing)}. If there 
 {synopt:{opt pre:post}}distinguishes the pre- and post-treatment periods for treated units{p_end}
 {synopt:{opt xlabdist(integer)}}changes the gap between labels on the x-axis; default is {cmd: 1}{p_end}
 {synopt:{opt ylabdist(integer)}}changes the gap between labels on the y-axis; default is {cmd: 1}{p_end}
-{synopt:{opt bygroup}}puts each unit into different treatment groups, then plot them separately when {cmd: type(outcome)} is invoked{p_end}
+{synopt:{opt bygroup}}puts each unit into different treatment groups, then plot them separately in a column when {cmd: type(outcome)} is invoked{p_end}
 {synopt:{opt style()}}determines the style of the elements in a plot. The first and second entries define the style of the outcome and treatment, respectively.
 {cmd:connected} or {cmd:c} for connected lines, {cmd:line} or {cmd:l} for lines, and {cmd:bar} or {cmd:b} for bars{p_end}
 {synopt:{opt byunit}}plots the outcome and treatment variables against time by each unit when {cmd: type(bivariate)} is invoked{p_end}
 {synopt:{opt theme(bw)}}uses the black and white theme (default when specified {cmd:type(bivar)}){p_end}
 {synopt:{opt lwd()}}sets the line width in {cmd:type(bivar)}. Default is {cmd:medium}{p_end}
 {synopt:{opt leavegap}}keeps the time gap as an white bar if time is not evenly distributed (possibly due to missing data){p_end}
+{synopt:{opt bygroupside}}arranges subfigures of {cmd:bygroup} in a row rather than in a column{p_end}
+{synopt:{opt displayall}}shows all units if the number of units is more than 500, otherwise we randomly select 500 units to present{p_end}
 {synopt:{opt *}}Common graph options, such as {cmd:title}, {cmd:ytitle}, {cmd:xtitle}, {cmd:xlabel}, {cmd:ylabel}, and {cmd:legend}, can be applied in {cmd:panelview} as well.
 
 {synoptline}
@@ -128,11 +130,10 @@ Here we change the texts and sizes of titles using {cmd: xtitle}, {cmd: ytitle},
 {p 6 6 2}The three different colors represent the pure control units, treated units in the pre-treatment periods, and treated units in the post-treatment period. {p_end}
 {p 6 6 2}Different from a treatment status plot, an outcome plot does not allow {cmd:xlabdist} and {cmd:ylabdist}. Instead, {cmd:xlabel} and {cmd:ylabel} can be used to adjust looks of axis labels. {p_end}
 
-{phang2}. {stata panelview turnout policy_edr, i(abb) t(year) type(outcome) bygroup prepost xlabel(1920 (20) 2000)}{p_end}
+{phang2}. {stata panelview turnout policy_edr, i(abb) t(year) type(outcome) bygroup xlabel(1920 (20) 2000)}{p_end}
 
 {p 6 6 2}Because {cmd:bygroup} is invoked, {cmd: panelview} analyzes the data and automatically put each unit into different groups based on the changes of their treatment statuses,
-e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed.
-{cmd:prepost} distinguishes pre- and post-treatment periods in group (3).{p_end}
+e.g. (1) units always being treated, (2) units always under control, (3) units whose treatment status has changed.{p_end}
 
 {pstd}Discrete Outcomes{p_end}
 {phang2}. {stata sysuse simdata, clear}{p_end}
@@ -171,8 +172,8 @@ Instead of using {cmd:ytitle}, we use {cmd:l1title} and {cmd:r1title} to label t
 
 {title:Authors}
 
-      Hongyu Mou (Maintainer), hongyumou5@gmail.com
-      Peking University
+      Hongyu Mou (Maintainer), hongyumou@g.ucla.edu
+      University of California, Los Angeles
       
       Yiqing Xu, yiqingxu@stanford.edu
       Stanford University
