@@ -146,13 +146,15 @@ panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(ou
 *bygroupside
 panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") by(, title("EDR Reform and Turnout")) bygroupside xlabel(1920 (20) 2000)
 
+*bycohort
+panelview turnout policy_edr, i(abb) t(year) type(outcome) bycohort prepost
 
 
 /***** 8. Plotting any variable in a panel dataset *****/
 * Plot an outcome variable (or any variable) in a panel dataset (type = "outcome")
 *Ignore treatment status 
 use turnout.dta, clear 
-panelview turnout, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("Turnout") ylabel(0 (25) 100) ignoretreat
+panelview turnout, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("Turnout") ylabel(0 (25) 100) 
 
 
 

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.2 17July2022}{...}
+{* *! version 0.1.3 25Aug2022}{...}
 {cmd:help panelview}
 {hline}
 
@@ -34,7 +34,7 @@ Variables appearing in the {cmd:if}/{cmd:in} clause should be included in the va
 {synopt:{opt continuoustreat}}presents the treatment variable {cmd:D} in a continuous fashion{p_end}
 {synopt:{opt discreteoutcome}}when a variable is discrete, make sure {cmd: panelview} respects its discreteness in {cmd: type(outcome)} plots{p_end}
 {synopt:{opt bytiming}}sorts units by when they first receive the treatment; if the timing is the same, then by the total number of periods exposed to the treatment{p_end}
-{synopt:{opt ignoretreat}}omits the treatment indicator, that is, any variables after {cmd: Y} will be interpreted as covariates; useful in a {cmd:type(outcome)} plot{p_end}
+{synopt:{opt ignoretreat}}omits the treatment indicator, that is, any variables after {cmd: Y} will be interpreted as covariates{p_end}
 {synopt:{opt ignoreY}}shows treatment status of the first variable in the varlist instead of the second (e.g., D in formula is D X, instead of X).
 It needs to be combined with {cmd:type(treat)} or {cmd:type(missing)}. If there is only one variable in the varlist, the option is turned on by default{p_end}
 {synopt:{opt mycol:or(string)}}changes the color schemes; click {it:{help colorpalette:here}} for sequential colors (3-9 colors){p_end}
@@ -50,6 +50,7 @@ It needs to be combined with {cmd:type(treat)} or {cmd:type(missing)}. If there 
 {synopt:{opt leavegap}}keeps the time gap as an white bar if time is not evenly distributed (possibly due to missing data){p_end}
 {synopt:{opt bygroupside}}arranges subfigures of {cmd:bygroup} in a row rather than in a column{p_end}
 {synopt:{opt displayall}}shows all units if the number of units is more than 500, otherwise we randomly select 500 units to present{p_end}
+{synopt:{opt bycohort}}plots the average outcome lines based on unique treatment history{p_end}
 {synopt:{opt *}}Common graph options, such as {cmd:title}, {cmd:ytitle}, {cmd:xtitle}, {cmd:xlabel}, {cmd:ylabel}, and {cmd:legend}, can be applied in {cmd:panelview} as well.
 
 {synoptline}
@@ -144,7 +145,7 @@ e.g. (1) units always being treated, (2) units always under control, (3) units w
 
 {pstd}Plotting any variable in a panel dataset{p_end}
 {phang2}. {stata sysuse turnout, clear}{p_end}
-{phang2}. {stata panelview turnout policy_edr, i(abb) t(year) type(outcome) ylabel(0 (25) 100) ignoretreat legend(off)}{p_end}
+{phang2}. {stata panelview turnout, i(abb) t(year) type(outcome) ylabel(0 (25) 100) legend(off)}{p_end}
 
 {p 6 6 2}When we ignore the treatment status and apply {cmd:type(outcome)}, {cmd: panelview} can plot an outcome variable or an arbitrary variable in a panel dataset.{p_end}
 

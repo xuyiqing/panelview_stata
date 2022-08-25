@@ -12,18 +12,17 @@ These tools can help researchers better understand their panel data before condu
 
 ------
 
-**Date:** July 17, 2022
+**Date:** Aug 25, 2022
 
-**Version:** 0.1.2 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
+**Version:** 0.1.3 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
 
 **Authors:** Hongyu Mou, Yiqing Xu
 
 **Reference:** Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive.
 
-**Update in v.0.1.2:** 
+**Update in v.0.1.3:** 
 
-1. Add option `bygroupside` to arrange subfigures of `bygroup` in a row rather than in a column.
-1. Add option `displayall` to show all units if the number of units is more than 500, otherwise we randomly select 500 units to present.
+1. Add `bycohort` to allow users to plot the average outcome trajectories of units with the same treatment history (if the number of unique treatment history is less than 20).
 
 Please report bugs to  hongyumou@g.ucla.edu or yiqingxu@stanford.edu.
 
@@ -524,6 +523,17 @@ panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(ou
 
 <img src="./graph/Graph26_1.png">
 
+### 5.4 Outcome trajectories by cohort
+
+Starting from v 0.1.3, users can use the `bycohort` option to plot the average outcome trajectories of units with same treatment history (if the number of unique treatment history is less than 20). This type of plots can help users diagnose the extent to which treatment effect heterogeneity may cause biases of certain estimators (e.g. the two-way fixed effects estimators).
+
+```
+use turnout.dta, clear
+panelview turnout policy_edr, i(abb) t(year) type(outcome) bycohort prepost
+```
+
+<img src="./graph/Graph26_2.png">
+
 ------
 
 ## 6. Discrete Outcomes 
@@ -554,11 +564,11 @@ panelview Y D if time >= 8 & time <= 15, type(outcome) i(id) t(time) discreteout
 
 ## 7. Plotting Any Variable In Panel Dataset
 
-Plot an outcome variable (or any variable) in a panel dataset by `type(outcome)` and `ignoretreat`: 
+Plot an outcome variable (or any variable) in a panel dataset by `type(outcome)`: 
 
 ```
 use turnout.dta, clear 
-panelview turnout, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("Turnout") ylabel(0 (25) 100) ignoretreat
+panelview turnout, i(abb) t(year) type(outcome) xtitle("Year") ytitle("Turnout") title("Turnout") ylabel(0 (25) 100)
 ```
 
 <img src="./graph/Graph27.png">

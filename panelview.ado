@@ -1,6 +1,5 @@
 /*
-Version 0.1.2
-July 17 2022
+Aug 25 2022
 Hongyu Mou, Yiqing Xu
 */
 
@@ -29,6 +28,7 @@ program define panelview
 	leavegap						///
 	bygroupside						///
 	displayall						///
+	bycohort						///
 	*								///
 	]
 	
@@ -116,6 +116,14 @@ program define panelview
 		}
 	}
 
+	if ("`type'" != "outcome") {
+		if ("`bycohort'" != "") {
+			di as err ///
+			"option bycohort should be combined with option type(outcome)"
+			exit 198
+		}
+	}
+
 	if ("`type'" == "outcome" | "`type'" == "bivar") {
 		if ("`leavegap'" != "") {
 			di as err ///
@@ -148,6 +156,9 @@ program define panelview
 		}
 	}
 
+	if ("`bycohort'" != "") {
+	loc leavegap 1
+	}
 
 
     set trace off
@@ -259,8 +270,9 @@ program define panelview
 	//limit the unit number:
 	by `i', sort: gen nvals = _n == 1 
 	qui count if nvals 
-	if (r(N) > 500 & "`displayall'" == "") { 
-		di "If the number of units is more than 500, we randomly select 500 units to present. You can use displayall option to show all units."
+	*di "`r(N)'" 
+	if (r(N) > 500 & "`displayall'" == "") {
+		di "If the number of units is more than 500, we randomly select 500 units to present. You can use displayall option to show all units"
 		tempfile holding
 		qui save `holding'
 
@@ -315,6 +327,17 @@ program define panelview
 	if !_rc {
 	qui levelsof `treat' if `touse', loc (levstreat)
 	loc numlevstreat = r(r) 
+	if ("`bycohort'" != "" & `numlevstreat' != 2) {
+		di as err "option bycohort works only with dummy treatment variable"
+		exit 198
+	}
+	}
+
+	
+	capture assert `treat' == 0 | `treat' == 1
+	if ("`bycohort'" != "" & _rc) {
+		di as err "option bycohort works only with dummy treatment variable"
+		exit 198
 	}
 
 	if ("`ignoretreat'" != "" | "`type'" == "miss" | "`type'" == "missing") { 
@@ -328,7 +351,7 @@ program define panelview
     		*if ("`ignoretreat'" != "" | "`type'" == "miss" | "`type'" == "missing") { 
 			*cap gen `gcontrol' = 1 
 			*} 
-			else {			
+			*else {			
 			if (`numlevstreat' == 2) {
 			tempvar max_treat
 			cap bys `nids': egen `max_treat' = max(`treat') 
@@ -357,7 +380,7 @@ program define panelview
 					}
 				}
 			}
-			}
+			*}
 		}	
 
 	sort `ids' `tunit' 
@@ -687,11 +710,13 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 	if ("`type'" == "outcome") { 
 	//1. ploting outcome: type(outcome):
-		if ("`discreteoutcome'" == "" ) {
+	if ("`discreteoutcome'" == "" ) {
 		//1.1. plotting lines of continuous outcome:
 		di "now display lines of continuous outcome"
 		loc lines1
 		
+
+		if ("`bycohort'" == "" ) {
 		foreach w of loc levsplot {
 			foreach x of loc levsnids {
 					if (`"`prepost'"' != "" & `w' == 1 ) { 
@@ -788,8 +813,126 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 					}
 				}
 			}
-
 		}
+		else if ("`bycohort'" != "" ) {
+			* impute missing:
+			** expand to balanced panel:
+			qui tsset `nids' `tunit'
+			tsfill, full
+
+			tempvar stagger0 stagger
+			qui by `nids': gen `stagger0' =1 if `treat'[_n]-`treat'[_n+1]==0
+			qui by `nids': replace `stagger0' =0 if `treat'[_n]-`treat'[_n+1]==1
+			qui egen `stagger' = min(`stagger0')
+			loc staggersaclar=`stagger'
+
+			if `staggersaclar' == 1 { //staggered adoption: only allow dummy treatment
+				qui bysort `nids' (`tunit'): replace `treat' = `treat'[_n-1] if `treat' == .
+
+				gsort `nids' -`tunit'
+				qui bysort `nids': replace `treat' = `treat'[_n-1] if `treat' == .
+				sort `nids' `tunit'
+
+				*qui bysort `nids' (`tunit'): replace `treat' = 1 if `treat' == . & `treat'[_n-1] == 1 
+				
+				*gsort `nids' -`tunit'
+				*qui bysort `nids': replace `treat' = 0 if `treat' == . & `treat'[_n-1] == 0 
+				*sort `nids' `tunit'
+			}
+			else if `staggersaclar' == 0 { //treatment reversal:
+				di as err "option bycohort works only with staggered adoption"
+				exit 198
+			}
+
+
+
+			* graph:
+			qui tostring `treat', replace
+			tempvar history	numhistorylevels
+			qui bysort `nids' (`tunit'): generate `history' = `treat'[1]
+			qui by `nids': replace `history' = `history'[_n-1] + `treat' if _n > 1
+			qui by `nids': replace `history' = `history'[_N]
+			qui by `history', sort: gen `numhistorylevels' = _n == 1 
+
+			*tab `history', m //sss
+			sort `nids' `tunit'
+			*list in 1/180
+
+			qui count if `numhistorylevels' 
+			display "Number of unique treatment history: `r(N)'"
+			
+
+			if (`r(N)' > 20) {   
+				di as error "Option bycohort would not work if the number of unique treatment history is more than 20."
+				exit 198
+			}
+			else { // `r(N)' <= 20
+			tempvar outcomehistorymean historygroup
+			qui egen `outcomehistorymean' = mean(`outcome'), by(`history' `tunit')
+			qui replace `outcome' = `outcomehistorymean'
+			qui egen `historygroup' = group(`history')
+			qui levelsof `historygroup' if `touse', loc(historylevels)
+			tempfile cohortlinehistory
+			qui keep `outcome' `historygroup' `tunit' `gcontrol' `lastchangedot' `plotvalue' `touse'
+			qui duplicates drop
+			qui sum `tunit'
+			qui replace `lastchangedot' = 0 if `tunit' != r(max)
+			qui save `cohortlinehistory'
+
+			foreach w of loc levsplot { //levsplot: 0 <- control; 1 <- pre; 2 <- post
+				foreach x of loc historylevels {
+					if (`"`prepost'"' != "" & `w' == 1 ) {
+					//with prepost: `w' == 1: treated(pre)
+					if `islastchangedot' == 0 {
+						loc lines1 `" `lines1' || line `outcome' `tunit' if `historygroup' == `x' & `gcontrol' == 0 & `touse', lcolor("`col`w''")"'
+					}
+					else{
+						loc lines1 `" `lines1' || line `outcome' `tunit' if `historygroup' == `x' & `gcontrol' == 0 & `touse', lcolor("`col`w''") || scatter `outcome' `tunit' if `historygroup' == `x' & `gcontrol' == 0 & `touse' & `lastchangedot' == 1, mcolor("`col`3''") msize(vsmall)"'
+					}
+					} 
+					else if (`"`prepost'"' == "" & `w' == 0 ) { 
+					//without prepost: `w' == 0: treated(pre)
+					if `islastchangedot' == 0 {
+						loc lines1 `" `lines1' || line `outcome' `tunit' if `historygroup' == `x' & `gcontrol' == 0 & `touse', lcolor("`col`w''")"'
+						}
+					else {
+						loc lines1 `" `lines1' || line `outcome' `tunit' if `historygroup' == `x' & `gcontrol' == 0 & `touse', lcolor("`col`w''") || scatter `outcome' `tunit' if `historygroup' == `x' & `gcontrol' == 0 & `touse' & `lastchangedot' == 1, mcolor("`col`2''") msize(vsmall)"'
+					}
+					}
+				loc lines1 `" `lines1' || line `outcome' `tunit' if `historygroup' == `x' & `plotvalue' == `w' & `touse', lcolor("`col`w''")"' 
+				}
+			}
+			sort `tunit'
+			if (`"`prepost'"' != "") { //with prepost:
+				if `islastchangedot' == 0 { //no last changedot
+					tempvar allunits
+					qui egen `allunits' = max(`historygroup') 
+					local largestlegend = 3*`allunits' + 1
+					local midlegend = 2*`allunits'
+					tw `lines1'  legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) ytitle("Cohort Average") title("Cohort Outcome Trajectories") `options'
+				}
+				else { //with last changedot
+					tempvar allunits 								
+					qui egen `allunits' = max(`historygroup') 
+					local largestlegend = `allunits' + 2
+					local midlegend = `allunits' + 1
+					tw `lines1' sort legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `midlegend' "Treated (Pre)" `largestlegend' "Treated (Post)") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) ytitle("Cohort Average") title("Cohort Outcome Trajectories") `options'
+				}
+			}
+			else { //prepost = off:
+				if `islastchangedot' == 0 { //no last changedot
+					tempvar allunits
+					qui egen `allunits' = max(`historygroup') 
+					local largestlegend=3*`allunits'
+					tw `lines1'  legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" `largestlegend' "Treated") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) ytitle("Cohort Average") title("Cohort Outcome Trajectories") `options'
+				}
+				else { //with last changedot
+					tw `lines1' sort legend(region(lstyle(none) fcolor(none)) rows(1) order(1 "Control" 2 "Treated") size(*0.8) symxsize(3) keygap(1)) yscale(noline) xscale(noline) ytitle("Cohort Average") title("Cohort Outcome Trajectories") `options'
+				}
+			}
+		}
+		}
+	}
 		else { 
 		//1.2. plotting dots of discrete outcome:
 		
@@ -836,15 +979,17 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 					}
 					}
 					}
-			}
-		}		
-	}
+					}	
+			}		
+		}
 	
 	
 	
 	
 	
-	else if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing"){
+	
+	
+	else if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing") {
 	// 2. Heatmap of treatment: type(treat):
 
 		if `"`bytiming'"' != "" {
