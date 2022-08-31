@@ -14,7 +14,7 @@ These tools can help researchers better understand their panel data before condu
 
 **Date:** Aug 25, 2022
 
-**Version:** 0.1.3 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1 (Stata Statistical Software Components (*SSC*) archive)
+**Version:** 0.1.3 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1.3 (Stata Statistical Software Components (*SSC*) archive)
 
 **Authors:** Hongyu Mou, Yiqing Xu
 
@@ -102,6 +102,7 @@ panelview Y D X [if] [in], 			      ///
 	leavegap														///
 	bygroupside   											///
   displayall													///
+  bycohort														///
 	*									   								///
 	]
 ```
@@ -130,6 +131,7 @@ where the subcommand can be:
 | `leavegap` | Keep the time gap as a white bar if time is not evenly distributed (possibly due to missing data). |
 | `bygroupside` | Arrange subfigures of `bygroup` in a row rather than in a column. |
 | `displayall` | Show all units if the number of units is more than 500, otherwise we randomly select 500 units to present. |
+| `bycohort` | Plot the average outcome lines based on unique treatment history. |
 
 ------
 
