@@ -247,7 +247,7 @@ If the number of units is too much, we can use `collapsehistory` to plot only th
 panelview lnpop demo lngdp, i(country) t(year) type(treat) xlabdist(3) collapsehistory title("Unique Treatment Histories")
 ```
 
-<img src="./graph/Graph_collapse.png">
+<img src="./graph/Graph_Collapse.png">
 
 Instead of indicate `country` as units, we use `i(ccode)` to indicate country code as units, which will change the label and sequence in our figure:
 
