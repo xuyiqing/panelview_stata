@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.3 25Aug2022}{...}
+{* *! version 0.1.4 29Dec2022}{...}
 {cmd:help panelview}
 {hline}
 
@@ -12,7 +12,7 @@
 {title:Syntax}
 
 {p 8 18 2}
-{cmdab:panelview} {it:{help varname:Y D}} {it:{help varlist:X}}
+{cmdab:panelview} {it:{help varname:Y}} [{it:{help varname:D}} {it:{help varlist:X}}]
 {ifin} 
 {cmd:,} {opt i(varname)} {opt t(varname numeric)} {opt type(string)}
 [{it:options}]
@@ -51,6 +51,8 @@ It needs to be combined with {cmd:type(treat)} or {cmd:type(missing)}. If there 
 {synopt:{opt bygroupside}}arranges subfigures of {cmd:bygroup} in a row rather than in a column{p_end}
 {synopt:{opt displayall}}shows all units if the number of units is more than 500, otherwise we randomly select 500 units to present{p_end}
 {synopt:{opt bycohort}}plots the average outcome lines based on unique treatment history{p_end}
+{synopt:{opt collapsehistory}}plots only the unique treatment histories, 
+including figures alongside the plot for the number of units whose histories are characterized by each pattern{p_end}
 {synopt:{opt *}}Common graph options, such as {cmd:title}, {cmd:ytitle}, {cmd:xtitle}, {cmd:xlabel}, {cmd:ylabel}, and {cmd:legend}, can be applied in {cmd:panelview} as well.
 
 {synoptline}

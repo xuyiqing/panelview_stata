@@ -37,16 +37,23 @@ use capacity.dta, clear
 label list country
 panelview lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) 
 
+*collapsehistory
+panelview lnpop demo lngdp , i(country) t(year) type(treat) xlabdist(3) collapsehistory title("Unique Treatment Histories")
+
 *ignoreY
 panelview demo lngdp , i(country) t(year) type(treat) mycolor(Reds) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) ignoreY
 
 *bytiming
 panelview lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) title("Democracy and State Capacity") xlabdist(3) ylabdist(10) bytiming
 
+*collapsehistory
+panelview lnpop demo lngdp, i(country) t(year) type(treat) xlabdist(3) collapsehistory title("Unique Treatment Histories")
+
 use capacity.dta, clear
 panelview lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity") xlabdist(3) ylabdist(10)
 *bytiming
 panelview lnpop demo lngdp, i(ccode) t(year) type(treat) mycolor(PuBu) title("Democracy and State Capacity: Treatement Status", size(medsmall)) bytiming xlabdist(3) ylabel(none) 
+
 
 
 

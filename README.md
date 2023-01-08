@@ -12,17 +12,18 @@ These tools can help researchers better understand their panel data before condu
 
 ------
 
-**Date:** Aug 25, 2022
+**Date:** Dec 29, 2022
 
-**Version:** 0.1.3 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1.3 (Stata Statistical Software Components (*SSC*) archive)
+**Version:** 0.1.4 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1.3 (Stata Statistical Software Components (*SSC*) archive)
 
 **Authors:** Hongyu Mou, Yiqing Xu
 
 **Reference:** Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive.
 
-**Update in v.0.1.3:** 
+**Update in v.0.1.4:** 
 
-1. Add `bycohort` to allow users to plot the average outcome trajectories of units with the same treatment history (if the number of unique treatment history is less than 20).
+1. Provide tables on variables examined for missing values when using the `treat` or `missing` type. 
+1. Add `collapsehistory` option to plot only the unique treatment histories, including figures alongside the plot for the number of units whose histories are characterized by each pattern.
 
 Please report bugs to  hongyumou@g.ucla.edu or yiqingxu@stanford.edu.
 
@@ -81,7 +82,7 @@ An overview of the syntax is below. Note that *Y*, *D*, and *X* in the table are
 The general syntax of the package can be summarized as:
 
 ```
-panelview Y D X [if] [in], 			      ///
+panelview Y [D X] [if] [in], 			      ///
 	i(varname) t(varname numeric)	      ///
 	type(string)						   					///
 	[									  				 				///
@@ -103,6 +104,7 @@ panelview Y D X [if] [in], 			      ///
 	bygroupside   											///
   displayall													///
   bycohort														///
+  collapsehistory											///
 	*									   								///
 	]
 ```
@@ -132,6 +134,7 @@ where the subcommand can be:
 | `bygroupside` | Arrange subfigures of `bygroup` in a row rather than in a column. |
 | `displayall` | Show all units if the number of units is more than 500, otherwise we randomly select 500 units to present. |
 | `bycohort` | Plot the average outcome lines based on unique treatment history. |
+| `collapsehistory` | Plot only the unique treatment histories, including figures alongside the plot for the number of units whose histories are characterized by each pattern. |
 
 ------
 
@@ -236,6 +239,15 @@ panelview lnpop demo lngdp, i(country) t(year) type(treat) mycolor(Reds) title("
 ```
 
 <img src="./graph/Graph8.png">
+
+If the number of units is too much, we can use `collapsehistory` to plot only the unique treatment histories, including figures alongside the plot for the number of units whose histories are characterized by each pattern: 
+
+```
+*collapsehistory
+panelview lnpop demo lngdp, i(country) t(year) type(treat) xlabdist(3) collapsehistory title("Unique Treatment Histories")
+```
+
+<img src="./graph/Graph_collapse.png">
 
 Instead of indicate `country` as units, we use `i(ccode)` to indicate country code as units, which will change the label and sequence in our figure:
 

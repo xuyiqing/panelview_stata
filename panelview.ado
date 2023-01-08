@@ -1,5 +1,5 @@
 /*
-Aug 25 2022
+Dec 29 2022
 Hongyu Mou, Yiqing Xu
 */
 
@@ -29,6 +29,7 @@ program define panelview
 	bygroupside						///
 	displayall						///
 	bycohort						///
+	collapsehistory					///
 	*								///
 	]
 	
@@ -41,25 +42,25 @@ program define panelview
 	cap which colorpalette.ado
 	if _rc {
 		*di as error "colorpalette.ado required: {stata ssc install palettes, replace}"
-		di as error "colorpalette.ado required: {stata search gr0075} and click to install"
+		di as error "colorpalette.ado required: {stata search gr0075} and click to install, and please make sure the other required packages (labutil, sencode, grc1leg) are installed"
 		exit 199
 	}
 	
 	cap which labmask.ado
 	if _rc {
-		di as error "labmask.ado required: {stata ssc install labutil, replace}"
+		di as error "labmask.ado required: {stata ssc install labutil, replace}, and please make sure the other required packages (gr0075, sencode, grc1leg) are installed"
 		exit 199
 	}
 
 	cap which sencode.ado
 	if _rc {
-		di as error "sencode.ado required: {stata ssc install sencode, replace}"
+		di as error "sencode.ado required: {stata ssc install sencode, replace}, and please make sure the other required packages (labutil, gr0075, grc1leg) are installed"
 		exit 199
 	}
 
 	cap which grc1leg.ado
 	if _rc {
-		di as error "grc1leg.ado required: {stata search grc1leg} and click to install"
+		di as error "grc1leg.ado required: {stata search grc1leg} and click to install, and please make sure the other required packages (labutil, gr0075, sencode) are installed"
 		exit 199
 	}
 	
@@ -117,6 +118,30 @@ program define panelview
 	}
 
 	if ("`type'" != "outcome") {
+		if ("`bygroup'" != "") {
+			di as err ///
+			"option bygroup should be combined with type(outcome)"
+			exit 198
+		}
+	}
+
+	if ("`type'" != "treat") {
+		if ("`collapsehistory'" != "") {
+			di as err ///
+			"option collapsehistory should be combined with type(treat)"
+			exit 198
+		}
+	}
+
+	if ("`leavegap'" != "") {
+		if ("`collapsehistory'" != "") {
+			di as err ///
+			"options collapsehistory and leavegap should not be combined"
+			exit 198
+		}
+	}
+
+	if ("`type'" != "outcome") {
 		if ("`bycohort'" != "") {
 			di as err ///
 			"option bycohort should be combined with option type(outcome)"
@@ -149,6 +174,14 @@ program define panelview
 	}
 
 	if ("`ignoretreat'" != "") {
+		if ("`collapsehistory'" != "") {
+			di as err ///
+			"option collapsehistory should not be combined with ignoretreat"
+			exit 198
+		}
+	}
+
+	if ("`ignoretreat'" != "") {
 		if ("`type'" == "miss" | "`type'" == "missing") {
 			di as err ///
 			"option type(missing) should not be combined with ignoretreat"
@@ -156,9 +189,12 @@ program define panelview
 		}
 	}
 
+	
+
 	if ("`bycohort'" != "") {
 	loc leavegap 1
 	}
+
 
 
     set trace off
@@ -175,12 +211,17 @@ program define panelview
 	
 
 	qui keep `varlist' `i' `t' //only keep using variables, i.e. include covariates
-
+	
 	qui ds `varlist'
 	tempvar numvar
 	cap gen `numvar' = `: word count `r(varlist)''
-
-
+/*
+	if ("`ignoretreat'" != "" | "`type'" == "miss" | "`type'" == "missing") {
+		if `numvar' > 1 {
+			di "All variables other than the first is omitted"
+		}
+	}
+*/
 	if `numvar' == 1 {
 		if ("`ignoretreat'" == "" & "`type'" != "miss" & "`type'" != "missing" & "`type'" != "treat" & "`type'" != "outcome") {
 				di as err "should combine with option ignoretreat, type(missing), type(treat) , or type(outcome) when varlist has only one variable" 
@@ -239,23 +280,147 @@ program define panelview
 	}
 	}
 
+qui save `backup',replace
 
+if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing") {
+		tempfile backup_misstable
 
-	marksample touse 
-
-	if "`leavegap'" == "" {
-	cap drop if `touse' == 0
-	}
-	else if "`leavegap'" != "" {
+		marksample touse 
+		
+		//drop missing from controls sss
 		tempvar countmissvar minrowmiss
 		qui replace `touse' = . if `touse' == 0
 		qui egen `countmissvar' = rowmiss(`touse')
 		qui bysort `i': egen `minrowmiss' = min(`countmissvar')
-		cap drop if `minrowmiss' != 0
-	}
+		*cap drop if `minrowmiss' != 0 //table right, figure wrong sss
+
+		//cap drop if `touse' == 0 //figure right, table wrong
+
+		// misschk `varlist', extmiss // search misschk; install spost9_ado
+		// strip off string variables	
+
+		tempvar varlist1
+
+		loc varlist1 `varlist'
+
+		parse "`varlist1'", parse(" ")
+		local vars
+		while "`1'" != ""  { // loop through variables
+			capture confirm numeric variable `1'
+			if _rc==0 {
+				local vars "`vars' `1'"
+			}
+			mac shift
+		}
+
+		local varlist1 "`vars'"
+		parse "`varlist1'", parse(" ")
+
+		local nvar = 0
+
+		di _n in g "   #  Variable        # Missing   % Missing"
+		di    in g "--------------------------------------------"
+		
+		tempvar ifin
+    	mark `ifin' `if' `in'
+		quietly tab `ifin'
+		local total = r(N)	
+		*display `total'
 		
 
+		while "`1'" != ""  { // loop through variables
+			local ++nvar
+			//qui count if `1'>=. // count missing; changed == 1.1.0
+			qui count if `1'>=. & `ifin' // count missing; changed == 1.1.0
+			* create binary variables indicating if observation is missing
+			if "`dummy'"~="" {
+				if "`replace'"=="replace" {
+					capture drop `gennm'`1'
+				}
+				//quietly gen `gennm'`1' = (`1'>=.) // changed == 1.1.0
+				quietly gen `gennm'`1' = (`1'>=.) if `ifin' // changed == 1.1.0
+					label var `gennm'`1' "Missing value for `1'?"
+					label val `gennm'`1' lmisschk
+			}
+			* list # and percent missing
+			di in y %3.0f "   `nvar' " _col(7) "`1'" ///
+				_col(23) %7.0f r(N) _col(36) %6.1f 100*r(N)/`total'
+			mac shift
+		} // loop through list of variables
 
+
+		parse "`varlist1'", parse(" ")
+		
+
+	//  loop through all variables and count missing
+
+    tempvar ismissn ismissw missw missn
+    quietly gen `missn' = 0 if `ifin'
+    label var `missn' "Missing for how many variables?"
+    quietly gen str1 `missw' = "" if `ifin'
+    label var `missw' "Missing for which variables?"
+
+    local nvar = 0
+    //local i = 0
+    local ext "a b c d e f g h i j k l m n o p q r s t u v w x y z" // 1.1.0
+    while "`1'" != ""  {
+        local ++nvar
+        * ones has only one's digit of variable number
+        local ones = mod(`nvar',10)
+
+        * drop tempvars from last loop
+        capture drop `ismissn' `ismissw'
+
+        * 1 if mssing, else 0; . if not in if in
+        capture quietly gen `ismissn' = (`1'>=.) if `ifin' // changed == 1.1.0
+
+        * string with indicator of missing status. Space if no missing;
+        * then if missing, either . or digit number.
+        capture quietly gen str1 `ismissw' = "`notmissstr'"
+
+            quietly replace `ismissw' = "." if `1'==. & `ifin'
+            foreach ltr in `ext' {
+                quietly replace `ismissw' = "`ltr'" if `1'==.`ltr' & `ifin'
+            }
+
+        * add blank every 5th variable
+        if mod(`nvar'-1,5) == 0 {
+            quietly replace `missw' = `missw' + " "
+        }
+
+        * build string with pattern of missing data
+        quietly replace `missw' = `missw' + `ismissw'
+        * count total number of missing for given case
+        quietly replace `missn' = `missn' + `ismissn'
+        mac shift
+    }
+    capture drop `ismissn' `ismissw'
+
+//  List results
+
+    * patterns of missing data
+    *tab `missw' if `ifin', `nosort'
+
+    * number missing for given observations
+    tab `missn' if `ifin'
+	qui save `backup_misstable', replace
+}
+
+	qui use `backup', clear
+
+	marksample touse 
+
+//drop missing from controls
+	if "`leavegap'" == "" {
+	cap drop if `touse' == 0
+	}
+	else if "`leavegap'" != "" { 
+		tempvar countmissvar minrowmiss
+		qui replace `touse' = . if `touse' == 0
+		qui egen `countmissvar' = rowmiss(`touse')
+		qui bysort `i': egen `minrowmiss' = min(`countmissvar') 
+		cap drop if `minrowmiss' != 0
+	}
 
 
 	quietly count if `touse'
@@ -268,8 +433,9 @@ program define panelview
 	local tunit `t'
 
 	//limit the unit number:
-	by `i', sort: gen nvals = _n == 1 
-	qui count if nvals 
+	bysort `i': gen nvals = (_n == 1)
+	qui count if nvals
+
 	*di "`r(N)'" 
 	if (r(N) > 500 & "`displayall'" == "") {
 		di "If the number of units is more than 500, we randomly select 500 units to present. You can use displayall option to show all units"
@@ -281,10 +447,10 @@ program define panelview
 
 		set seed 1234
 		qui sample 500, count
-		*tab `i', m
 
 		qui merge 1:m `i' using `holding', assert(match using) keep(match) nogenerate
 	}
+
 	
 	
 	tempvar nids
@@ -385,14 +551,9 @@ program define panelview
 
 	sort `ids' `tunit' 
 
+
 	//sort by time of first treatment
 	if "`bytiming'" != "" { 
-	cap which sencode.ado
-		if _rc {
-		di as error "sencode.ado required: {stata ssc install sencode, replace}"
-		exit 199
-		}
-
 		tempvar bytime 
 		tempvar min_bytime
 		tempvar num_trtime
@@ -595,8 +756,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 
 	qui levelsof `plotvalue' if `touse', loc (levsplot) 
-	loc numlevsplot = r(r) 
-	
+	loc numlevsplot = r(r) 	
 
 	if ("`ignoretreat'" == "") { 
 	if ("`continuoustreat'" == "" | "`type'" != "outcome") {
@@ -644,7 +804,8 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		}
 	}
 	
-	
+
+
 	qui return list
 	tokenize `levsplot' 
 	loc trpreortr `2'
@@ -655,6 +816,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 	else {
 		cap gen `nopre' = 0
 	}
+
 
 
 	if `nopre' != 1 { 
@@ -675,6 +837,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 			}
 		}
 	}
+
 
 
 
@@ -710,11 +873,29 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 	if ("`type'" == "outcome") { 
 	//1. ploting outcome: type(outcome):
-	if ("`discreteoutcome'" == "" ) {
+	if ("`discreteoutcome'" == "" ) { //continuous outcome
 		//1.1. plotting lines of continuous outcome:
+
+			qui tsset `nids' `tunit'
+			qui drop if `tunit'==.
+			tsfill, full
+
+			tempvar stagger0 stagger
+			qui by `nids': gen `stagger0' =1 if `treat'[_n]-`treat'[_n+1]==0
+			qui by `nids': replace `stagger0' =0 if `treat'[_n]-`treat'[_n+1]==1
+			qui egen `stagger' = min(`stagger0')
+			loc staggersaclar=`stagger'
+			if (`staggersaclar' == 0) { //treatment reversal:
+				if ("`continuoustreat'" == "" & "`ignoretreat'" == "" & `numlevsplot'!=1){
+					di as err "continuous outcome lines cannot work with treatment reversals in Stata, please try the R version to make it"
+					exit 198
+				}
+			}
+
+
 		di "now display lines of continuous outcome"
 		loc lines1
-		
+
 
 		if ("`bycohort'" == "" ) {
 		foreach w of loc levsplot {
@@ -854,7 +1035,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 			qui by `nids': replace `history' = `history'[_N]
 			qui by `history', sort: gen `numhistorylevels' = _n == 1 
 
-			*tab `history', m //sss
+			*tab `history', m
 			sort `nids' `tunit'
 			*list in 1/180
 
@@ -984,14 +1165,13 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		}
 	
 	
-	
-	
-	
-	
-	
+
+
+
 	else if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing") {
 	// 2. Heatmap of treatment: type(treat):
 
+	if  `"`collapsehistory'"' == "" {
 		if `"`bytiming'"' != "" {
 		*2.1. With bytiming:		
 		tempvar y0 y1
@@ -1127,6 +1307,144 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 				}
 			}
 		tw `gcom' plotr(fc(white) margin(zero)) ||`sc'  `options'
+	}
+
+
+	else if `"`collapsehistory'"' != "" { // with collapsehistory	
+				
+			qui tostring `treat', replace
+			tempvar history	numhistorylevels historymember
+			qui bysort `nids' (`tunit'): generate `history' = `treat'[1]
+			qui by `nids': replace `history' = `history'[_n-1] + `treat' if _n > 1
+			qui by `nids': replace `history' = `history'[_N]
+			qui by `history', sort: gen `numhistorylevels' = _n == 1 
+
+			qui bysort `history' `nids': gen `historymember'= _n == 1 
+			qui by `history': replace `historymember' = sum(`historymember')
+			qui by `history': replace `historymember' = `historymember'[_N]
+
+			*tab `history', m
+			*tab `history', m sort
+
+			tempvar historygroup
+			qui egen `historygroup' = group(`history')
+			*tab `historygroup', m
+			*tab `historygroup', m sort
+
+			tempvar labelhistorymember			
+			qui tostring `historymember', gen(`labelhistorymember')
+			labmask `historygroup', val(`labelhistorymember')
+
+
+			qui count if `numhistorylevels' 
+			display "Number of unique treatment history: `r(N)'"
+			
+		
+			tempfile cohortlinehistory
+			qui keep `treat' `historygroup' `historymember' `newtime' `lastchangedot' `plotvalue' `touse' `nopre'
+			qui duplicates drop
+			gsort -`historymember' `historygroup' `newtime'
+			*list
+
+			qui sum `newtime'
+			qui replace `lastchangedot' = 0 if `newtime' != r(max)
+			*list in 1/120
+			qui save `cohortlinehistory' //i: historygroup; t: newtime
+
+			qui sum `historygroup', mean
+			local ylabel `"ylabel(`r(min)'(1)`r(max)', alternate angle(0) nogrid labsize(tiny) valuelabel noticks)"'
+
+			tempvar y0 y1
+			cap gen `y1'=`historygroup'+ 0.5 
+			qui sum `y1'
+			la val `y1' `:val lab `historygroup''
+			cap gen `y0'=`historygroup'- 0.5 
+			
+			qui levelsof `plotvalue' if `touse', loc(levsplot)
+
+			qui sum `plotvalue' if `touse', mean
+			if (`r(min)' < 0) {
+				tempvar add 
+				cap gen `add' = 0 - `r(min)'
+				cap replace `plotvalue' = `plotvalue' + `add'
+				qui levelsof `plotvalue' if `touse', loc(levsplot_color)
+				colorpalette "198 219 239" "107 174 214" "66 146 198" "31 120 180" "8 81 156" , n(`numlevsplot') nograph
+				if (`"`mycolor'"' != "") {
+					colorpalette `mycolor' , n(`numlevsplot') nograph
+				}
+				foreach w of loc levsplot_color {
+				loc uu = `w' + 1 
+				loc col`w' = r(p`uu') 
+				}
+				foreach w of loc levsplot_color{
+					loc gcom `"`gcom'||rbar `y1' `y0' `newtime' if (`plotvalue'==`w')&(`touse'), barw(`xdist') col("`col`w''") fi(inten100) lw(none) "'
+					}
+			}
+			else {		
+				foreach w of loc levsplot{
+					loc gcom `"`gcom'||rbar `y1' `y0' `newtime' if (`plotvalue'==`w')&(`touse'), barw(`xdist') col("`col`w''") fi(inten100) lw(none) "'
+				}
+			}
+
+			loc sc `"sc `historygroup' `newtime' if `touse', mlabpos(0) msy(i)"' 
+
+			if `nopre' == 1 {
+					local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2) label(1 "Control") label(2 "Treated") size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("Number of `ids'") `ylabel' `xlabel' "'	
+				}
+				else { 
+				if (`"`prepost'"' != "") {
+					local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Control") label(2 "Treated (Pre)") label(3 "Treated (Post)") size(*0.6) symxsize(3) keygap(1)) xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1) xtitle("`tunit'") ytitle("Number of `ids'") `ylabel' `xlabel' "'
+					}
+					
+					else {
+						if "`continuoustreat'" != "" {
+						qui sum `treat'
+						loc maxminplotvalue = r(max) - r(min)
+						loc dismaxminplotvalue = `maxminplotvalue' / 4
+						loc r_max = r(max) + `dismaxminplotvalue'
+						tempvar plotvalue1
+						qui egen `plotvalue1' = cut(`treat'), at(`r(min)' (`dismaxminplotvalue') `r_max')
+						qui levelsof `plotvalue1' if `touse', loc (levsplot1)
+						tokenize `levsplot1'
+						loc contrlev1 `1'
+						loc contrlev2 `2'
+						loc contrlev3 `3'
+						loc contrlev4 `4'
+						loc contrlev5 `5'
+						loc contrlev11=round(`1', 0.001)
+						loc contrlev22=round(`2', 0.001)
+						loc contrlev33=round(`3', 0.001)
+						loc contrlev44=round(`4', 0.001)
+						loc contrlev55=round(`5', 0.001)
+						if `contrlev55' > `contrlev44' {
+							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4 5) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") label(5 "`contrlev55'") title("Treatment levels: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("Number of `ids'") `ylabel' `xlabel' "'
+						}
+						else {
+							local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3 4) label(1 "`contrlev11'") label(2 "`contrlev22'") label(3 "`contrlev33'") label(4 "`contrlev44'") title("Treatment level: ", size(*0.45)) size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("Number of `ids'") `ylabel' `xlabel' "'
+						}
+						}
+						else {
+							if `numlevstreat' > 2 {
+								tokenize `levsplot'
+								loc trlev1 `1'
+								loc trlev2 `2'
+								loc trlev3 `3'
+								loc trlev4 `4' // If the number of treatment levels >= 5, need to combine with Continuoustreat
+								if "`trlev4'" != ""{ //treatment levels = 4:
+								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(2) order(1 2 3 4) label(1 "Treatment level: `trlev1'") label(2 "Treatment level: `trlev2'") label(3 "Treatment level: `trlev3'") label(4 "Treatment level: `trlev4'") size(*0.55) symxsize(3) keygap(0.5) colgap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("Number of `ids'") `ylabel' `xlabel' "'
+								}
+								else { //treatment levels = 3:
+								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2 3) label(1 "Treatment level: `trlev1'") label(2 "Treatment level: `trlev2'") label(3 "Treatment level: `trlev3'") size(*0.55) symxsize(3) keygap(0.5) colgap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("Number of `ids'") `ylabel' `xlabel' "'
+								}
+							}
+							else { //treatment levels = 2:
+								local gcom `"`gcom' legend(region(lstyle(none) fcolor(none)) rows(1) order(1 2) label(1 "Control") label(2 "Treated") size(*0.6) symxsize(3) keygap(1))  xsize(2) ysize(2) yscale(noline reverse) xscale(noline) aspect(1)  xtitle("`tunit'") ytitle("Number of `ids'") `ylabel' `xlabel' "'
+							}
+						}
+					} 
+				}
+				tw `gcom' plotr(fc(white) margin(zero)) ||`sc' `options'
+	}
 	}
 
 
