@@ -787,7 +787,12 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 
 	//deciding color
-	colorpalette "198 219 239" "eltblue" "66 146 198" "31 120 180" "8 81 156", n(`numlevsplot') nograph
+	if ("`type'" == "outcome") {
+		colorpalette "198 219 239" "251 162 127" "red" "31 120 180" "8 81 156", n(`numlevsplot') nograph
+	}
+	else {
+		colorpalette "198 219 239" "eltblue" "66 146 198" "31 120 180" "8 81 156", n(`numlevsplot') nograph
+	}
 
 	if (`"`mycolor'"' != "") {
 		colorpalette `mycolor' , n(`numlevsplot') nograph
@@ -816,6 +821,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 	else {
 		cap gen `nopre' = 0
 	}
+
 
 
 
@@ -1170,6 +1176,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 	else if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing") {
 	// 2. Heatmap of treatment: type(treat):
+	di "Note: White cells represent missing values/observations in data."
 
 	if  `"`collapsehistory'"' == "" {
 		if `"`bytiming'"' != "" {

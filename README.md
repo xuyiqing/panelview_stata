@@ -12,7 +12,7 @@ These tools can help researchers better understand their panel data before condu
 
 ------
 
-**Date:** Dec 29, 2022
+**Date:** Feb 4, 2023
 
 **Version:** 0.1.4 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1.3 (Stata Statistical Software Components (*SSC*) archive)
 
@@ -24,6 +24,8 @@ These tools can help researchers better understand their panel data before condu
 
 1. Provide tables on variables examined for missing values when using the `treat` or `missing` type. 
 1. Add `collapsehistory` option to plot only the unique treatment histories, including figures alongside the plot for the number of units whose histories are characterized by each pattern.
+1. Change color for the the `outcome` type plot.
+1. Add note for the the `treat` or `missing` type to indicate that the white cells represent missing values/observations in data.
 
 Please report bugs to  hongyumou@g.ucla.edu or yiqingxu@stanford.edu.
 
