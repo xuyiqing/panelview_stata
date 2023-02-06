@@ -1,5 +1,5 @@
 /*
-Dec 29 2022
+Feb 6 2023
 Hongyu Mou, Yiqing Xu
 */
 
@@ -437,6 +437,7 @@ if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing") {
 	qui count if nvals
 
 	*di "`r(N)'" 
+	if ("`bycohort'" == "" ) {
 	if (r(N) > 500 & "`displayall'" == "") {
 		di "If the number of units is more than 500, we randomly select 500 units to present. You can use displayall option to show all units"
 		tempfile holding
@@ -449,6 +450,7 @@ if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing") {
 		qui sample 500, count
 
 		qui merge 1:m `i' using `holding', assert(match using) keep(match) nogenerate
+	}
 	}
 
 	
