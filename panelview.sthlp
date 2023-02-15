@@ -90,6 +90,11 @@ Here we change the texts and sizes of titles using {cmd: xtitle}, {cmd: ytitle},
 {p 6 6 2}Use {cmd:bytiming} to sort units by the timing of receiving the treatment. We also use {cmd:label} and {cmd:size} options inside {cmd: legend} to specify label and size of the legend: {p_end}
 {phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) bytiming legend(label(1 "No EDR") label(2 "EDR") size(vsmall))}{p_end}
 
+{p 6 6 2}If the number of units is too much, we can use {cmd:collapsehistory} to plot only the unique treatment histories, including figures alongside the plot for the number of units whose histories are characterized by each pattern: {p_end}
+{phang2}. Load example data (the state capacity dataset){p_end}
+{phang2}. {stata sysuse capacity, clear}{p_end}
+{phang2}. {stata panelview lnpop demo lngdp, i(country) t(year) type(treat) xlabdist(3) collapsehistory title("Unique Treatment Histories")}{p_end}
+
 
 {pstd}Change the color schemes for the controls and treated using the {cmd:mycolor} option. For example, {cmd:PuBu} indicates light purple to blue:{p_end}
 {phang2}. {stata panelview turnout policy_edr policy_mail_in policy_motor, i(abb) t(year) type(treat) bytiming mycolor(PuBu)}{p_end}
@@ -97,7 +102,6 @@ Here we change the texts and sizes of titles using {cmd: xtitle}, {cmd: ytitle},
 
 {pstd}Treatment: missing & switch on and off{p_end}
 
-{pstd}Load example data (the state capacity dataset){p_end}
 {phang2}. {stata sysuse capacity, clear}{p_end}
 {phang2}. {stata panelview lnpop demo lngdp , i(country) t(year) type(treat) mycolor(Reds) xlabdist(3) ylabdist(10)}  {p_end}
 

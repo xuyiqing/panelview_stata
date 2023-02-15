@@ -1,5 +1,5 @@
 /*
-Feb 6 2023
+Feb 14 2023
 Hongyu Mou, Yiqing Xu
 */
 
@@ -1134,7 +1134,7 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 		//1.2. plotting dots of discrete outcome:
 		
 			//add some randomness to time units and outcome so that they can scatter around:
-			di "now display dots of discrete outcome"
+			* di "now display dots of discrete outcome"
 			tempvar rout rtime
 			cap gen `rtime' = `tunit' + runiform(-0.2, 0.2)
 			cap gen `rout' = `outcome' + runiform(-0.2, 0.2)
