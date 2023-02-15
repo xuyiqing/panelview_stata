@@ -12,7 +12,7 @@ These tools can help researchers better understand their panel data before condu
 
 ------
 
-**Date:** Feb 4, 2023
+**Date:** Feb 14, 2023
 
 **Version:** 0.1.4 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1.3 (Stata Statistical Software Components (*SSC*) archive)
 

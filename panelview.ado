@@ -189,6 +189,14 @@ program define panelview
 		}
 	}
 
+	if ("`leavegap'" != "") {
+		if ("`prepost'" != "") {
+			di as err ///
+			"option leavegap is not recommended to be combined with prepost"
+			exit 198
+		}
+	}
+
 	
 
 	if ("`bycohort'" != "") {
@@ -330,15 +338,15 @@ if ("`type'" == "treat" | "`type'" == "miss" | "`type'" == "missing") {
 
 		while "`1'" != ""  { // loop through variables
 			local ++nvar
-			//qui count if `1'>=. // count missing; changed == 1.1.0
-			qui count if `1'>=. & `ifin' // count missing; changed == 1.1.0
+			//qui count if `1'>=. // count missing; 
+			qui count if `1'>=. & `ifin' // count missing; 
 			* create binary variables indicating if observation is missing
 			if "`dummy'"~="" {
 				if "`replace'"=="replace" {
 					capture drop `gennm'`1'
 				}
-				//quietly gen `gennm'`1' = (`1'>=.) // changed == 1.1.0
-				quietly gen `gennm'`1' = (`1'>=.) if `ifin' // changed == 1.1.0
+				//quietly gen `gennm'`1' = (`1'>=.) // 
+				quietly gen `gennm'`1' = (`1'>=.) if `ifin' // 
 					label var `gennm'`1' "Missing value for `1'?"
 					label val `gennm'`1' lmisschk
 			}
@@ -790,10 +798,10 @@ if ("`type'" == "miss" | "`type'" == "missing") {
 
 	//deciding color
 	if ("`type'" == "outcome") {
-		colorpalette "198 219 239" "251 162 127" "red" "31 120 180" "8 81 156", n(`numlevsplot') nograph
+		colorpalette "198 219 239" "251 162 127" "red", n(`numlevsplot') nograph
 	}
 	else {
-		colorpalette "198 219 239" "eltblue" "66 146 198" "31 120 180" "8 81 156", n(`numlevsplot') nograph
+		colorpalette "198 219 239" "ebblue" "navy" "30 45 83" "black", n(`numlevsplot') nograph
 	}
 
 	if (`"`mycolor'"' != "") {
