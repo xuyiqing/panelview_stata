@@ -1,7 +1,5 @@
-/*
-Feb 14 2023
-Hongyu Mou, Yiqing Xu
-*/
+*! Hongyu Mou, Yiqing Xu
+*! 0.1.4 Feb 14 2023
 
 capture program drop panelview
 
