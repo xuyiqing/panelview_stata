@@ -12,20 +12,18 @@ These tools can help researchers better understand their panel data before condu
 
 ------
 
-**Date:** Feb 14, 2023
+**Date:** Sep 24, 2023
 
-**Version:** 0.1.4 ([Github](https://github.com/xuyiqing/panelview_stata)); 0.1.4 (Stata Statistical Software Components (*SSC*) archive)
+**Version:** 1.0.0 ([Github](https://github.com/xuyiqing/panelview_stata)); 1.0.0 (Stata Statistical Software Components (*SSC*) archive)
 
 **Authors:** Hongyu Mou, Yiqing Xu
 
-**Reference:** Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive.
+**Reference:** Hongyu Mou, Licheng Liu, and Yiqing Xu. "Panel Data Visualization in R (panelView) and Stata (panelview)." Journal of Statistical Software, 107(7), 1-20, 2023. doi:10.18637/jss.v107.i07.
 
-**Update in v.0.1.4:** 
+**Update in v.1.0.0:** 
 
-1. Provide tables on variables examined for missing values when using the `treat` or `missing` type. 
-1. Add `collapsehistory` option to plot only the unique treatment histories, including figures alongside the plot for the number of units whose histories are characterized by each pattern.
-1. Change color for the the `outcome` type plot.
-1. Add note for the the `treat` or `missing` type to indicate that the white cells represent missing values/observations in data.
+1. Updated formal citation for the Journal of Statistical Software (JSS).
+2. Officially released version 1.0.0.
 
 Please report bugs to  hongyumou@g.ucla.edu or yiqingxu@stanford.edu.
 

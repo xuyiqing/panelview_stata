@@ -190,6 +190,6 @@ Instead of using {cmd:ytitle}, we use {cmd:l1title} and {cmd:r1title} to label t
       
 {title:Citation}
 
-      Mou, Hongyu & Yiqing Xu. "panelview for visualizing panel data: a Stata package." Available at Statistical Software Components (SSC) archive. 
+      Hongyu Mou, Licheng Liu, and Yiqing Xu. "Panel Data Visualization in R (panelView) and Stata (panelview)." Journal of Statistical Software, 107(7), 1-20, 2023. doi:10.18637/jss.v107.i07.
 
       For more examples, click {browse "https://github.com/xuyiqing/panelview_stata"}.
